@@ -8,7 +8,7 @@ const UserProfile = ({ userId }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`/user-profile/${userId}`);
+        const response = await axios.get(`https://e-learn-ncux.onrender.com/api/progress/${userId}`);
         setProfile(response.data);
       } catch (error) {
         console.error('Failed to fetch user profile:', error);

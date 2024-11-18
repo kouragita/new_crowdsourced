@@ -7,7 +7,8 @@ import LearningPaths from './pages/LearningPaths';
 import Community from './pages/Community';
 import Challenges from './pages/Challenges';
 import Profile from './pages/Profile';
-import NotFound from './pages/NotFound';
+import NotFound from './pages/Notfound';
+import LoginForm from './components/Auth/LoginForm';
 
 const App = () => (
   <Router>
@@ -20,6 +21,7 @@ const App = () => (
         <Route path="/challenges" element={<Challenges />} />
         <Route path="/profile" element={<Profile userId={1} />} />
         <Route path="*" element={<NotFound />} />
+        <Route path="/login" element={<LoginForm />} />
       </Routes>
     </main>
     <Footer />

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+
 const Navbar = () => {
   const navigate = useNavigate();
 
@@ -17,6 +18,7 @@ const Navbar = () => {
         <li><Link to="/community">Community</Link></li>
         <li><Link to="/challenges">Challenges</Link></li>
         <li><Link to="/profile">Profile</Link></li>
+        <li><Link to="/login">Login</Link></li>
         <li><button onClick={handleLogout}>Logout</button></li>
       </ul>
     </nav>

@@ -9,7 +9,7 @@ const LearningPathDetail = () => {
   useEffect(() => {
     const fetchLearningPath = async () => {
       try {
-        const response = await axios.get(`/learning-paths/${id}`);
+        const response = await axios.get(`https://e-learn-ncux.onrender.com/learning-paths/${id}`);
         setLearningPath(response.data);
       } catch (error) {
         console.error('Failed to fetch learning path:', error);

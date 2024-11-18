@@ -8,7 +8,7 @@ const CommentsSection = ({ resourceId }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await axios.get(`/resources/${resourceId}/comments`);
+        const response = await axios.get(`https://e-learn-ncux.onrender.com/api/resources/${resourceId}/comments`);
         setComments(response.data);
       } catch (error) {
         console.error('Failed to fetch comments:', error);
@@ -21,7 +21,7 @@ const CommentsSection = ({ resourceId }) => {
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`/resources/${resourceId}/comment`, {
+      const response = await axios.post(`https://e-learn-ncux.onrender.com/api/resources/${resourceId}/comment`, {
         text: newComment,
       });
       setComments((prev) => [...prev, response.data]);

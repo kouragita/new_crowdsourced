@@ -7,7 +7,7 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const response = await axios.get('/leaderboard');
+        const response = await axios.get('https://e-learn-ncux.onrender.com/api/leaderboards');
         setLeaderboard(response.data);
       } catch (error) {
         console.error('Failed to fetch leaderboard:', error);

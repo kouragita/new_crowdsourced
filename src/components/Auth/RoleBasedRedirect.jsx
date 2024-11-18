@@ -19,7 +19,7 @@ const RoleBasedRedirect = () => {
 
       } catch (err) {
         console.error('Error fetching role:', err);
-        navigate('/login'); // Redirect to login if no role or token is invalid
+        navigate('/login');
       }
     };
 

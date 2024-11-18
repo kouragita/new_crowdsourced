@@ -1,5 +1,5 @@
 import React from 'react';
-import ChallengeList from '../components/Challenges/ChallengeList';
+import ChallengeList from '../components/Challenges/ChallengesList';
 import EventHighlights from '../components/Challenges/EventHighlights';
 
 const Challenges = () => (

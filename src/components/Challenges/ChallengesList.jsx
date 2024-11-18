@@ -7,7 +7,7 @@ const ChallengeList = () => {
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
-        const response = await axios.get('/challenges');
+        const response = await axios.get('https://e-learn-ncux.onrender.com/api/challenges');
         setChallenges(response.data);
       } catch (error) {
         console.error('Failed to fetch challenges:', error);

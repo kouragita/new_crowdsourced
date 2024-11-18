@@ -8,7 +8,7 @@ const Ratings = ({ resourceId }) => {
   useEffect(() => {
     const fetchRating = async () => {
       try {
-        const response = await axios.get(`/resources/${resourceId}/ratings`);
+        const response = await axios.get(`https://e-learn-ncux.onrender.com/api/resources/${resourceId}/ratings`);
         setAverageRating(response.data.averageRating);
       } catch (error) {
         console.error('Failed to fetch ratings:', error);

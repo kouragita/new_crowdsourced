@@ -7,7 +7,7 @@ const EventHighlights = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('/events');
+        const response = await axios.get('https://e-learn-ncux.onrender.com/api/challenges');
         setEvents(response.data);
       } catch (error) {
         console.error('Failed to fetch events:', error);

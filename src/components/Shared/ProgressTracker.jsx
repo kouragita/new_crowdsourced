@@ -7,7 +7,7 @@ const ProgressTracker = ({ userId }) => {
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        const response = await axios.get(`/user-profile/${userId}`);
+        const response = await axios.get(`https://e-learn-ncux.onrender.com/api/progress/${userId}`);
         setProgress(response.data.progress);
       } catch (error) {
         console.error('Failed to fetch progress:', error);

@@ -19,7 +19,7 @@ const SignupForm = () => {
     }
 
     try {
-      await axios.post('/auth/signup', { email, password });
+      await axios.post('https://e-learn-ncux.onrender.com/auth/signup', { email, password });
       setSuccess('Signup successful! You can now login.');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to signup');
