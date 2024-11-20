@@ -10,8 +10,9 @@ import Dashboard from './components/Dashboard';
 import UserProfile from './components/UserProfile.jsx';
 import UserDashboard from './components/UserDashboard.jsx';
 import Calendar from './components/Calendar.jsx';
-import CoursesPage from "./pages/CoursesPages.jsx"
-
+import CoursesPage from "./pages/CoursesPages.jsx";
+import ModulesPage from './pages/ModulesPage.jsx';
+import Leaderboard from './components/LeaderBoard.jsx';
 
 import './index.css';
 
@@ -19,18 +20,22 @@ const App = () => (
   <Router>
     <div>
       <Navbar />
-      <main className="min-h-screen"> {/* Ensure content does not overlap with the footer */}
+      <main className="min-h-screen">
         <Routes>
-
+          {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/signup" element={<SignupForm />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/user-dashboard" element={<UserDashboard />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/calendar" element={<Calendar />} />
 
+          {/* Dashboard routes with persistent sidebar */}
+          <Route path="/dashboard" element={<Dashboard />}>
+            <Route index element={<UserDashboard />} /> {/* Default dashboard content */}
+            <Route path="profile" element={<UserProfile />} />
+            <Route path="courses" element={<CoursesPage />} />
+            <Route path="calendar" element={<Calendar />} />
+            <Route path="leaderboard" element={<Leaderboard />} />
+            <Route path="modules/:pathId" element={<ModulesPage />} />
+          </Route>
         </Routes>
       </main>
       <Footer />

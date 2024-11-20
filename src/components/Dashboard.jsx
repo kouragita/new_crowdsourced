@@ -1,14 +1,8 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Import Link from React Router
-import { FaUser, FaTachometerAlt, FaBook, FaCalendarAlt } from "react-icons/fa"; // Import icons from React Icons
+import React from "react";
+import { Outlet, Link } from "react-router-dom";
+import { FaUser, FaTachometerAlt, FaBook, FaCalendarAlt, FaTrophy } from "react-icons/fa";
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState("profile");
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-  };
-
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
@@ -17,50 +11,48 @@ const Dashboard = () => {
         <ul className="space-y-4">
           <li>
             <Link
-              to="/profile" // Link to the Profile page
-              onClick={() => handleTabChange("profile")}
-              className={`w-full text-left p-2 rounded-lg ${
-                activeTab === "profile" ? "bg-blue-800" : "hover:bg-blue-700"
-              }`}
+              to="/dashboard/profile"
+              className="w-full text-left p-2 rounded-lg hover:bg-blue-700"
             >
-              <FaUser className="inline-block mr-2" /> {/* Profile Icon */}
+              <FaUser className="inline-block mr-2" />
               Profile
             </Link>
           </li>
           <li>
             <Link
-              to="/user-dashboard" // Link to the User Dashboard
-              onClick={() => handleTabChange("dashboard")}
-              className={`w-full text-left p-2 rounded-lg ${
-                activeTab === "dashboard" ? "bg-blue-800" : "hover:bg-blue-700"
-              }`}
+              to="/dashboard" // Default route
+              className="w-full text-left p-2 rounded-lg hover:bg-blue-700"
             >
-              <FaTachometerAlt className="inline-block mr-2" /> {/* Dashboard Icon */}
-              User Dashboard
+              <FaTachometerAlt className="inline-block mr-2" />
+              Dashboard
             </Link>
           </li>
           <li>
             <Link
-              to="/courses" // Link to the Courses page
-              onClick={() => handleTabChange("courses")}
-              className={`w-full text-left p-2 rounded-lg ${
-                activeTab === "courses" ? "bg-blue-800" : "hover:bg-blue-700"
-              }`}
+              to="/dashboard/courses"
+              className="w-full text-left p-2 rounded-lg hover:bg-blue-700"
             >
-              <FaBook className="inline-block mr-2" /> {/* Courses Icon */}
+              <FaBook className="inline-block mr-2" />
               Courses
             </Link>
           </li>
           <li>
             <Link
-              to="/calendar" // Link to the Calendar page
-              onClick={() => handleTabChange("calendar")}
-              className={`w-full text-left p-2 rounded-lg ${
-                activeTab === "calendar" ? "bg-blue-800" : "hover:bg-blue-700"
-              }`}
+              to="/dashboard/calendar"
+              className="w-full text-left p-2 rounded-lg hover:bg-blue-700"
             >
-              <FaCalendarAlt className="inline-block mr-2" /> {/* Calendar Icon */}
+              <FaCalendarAlt className="inline-block mr-2" />
               Calendar
+            </Link>
+          </li>
+          {/* New Link for Leaderboard */}
+          <li>
+            <Link
+              to="/dashboard/leaderboard"
+              className="w-full text-left p-2 rounded-lg hover:bg-blue-700"
+            >
+              <FaTrophy className="inline-block mr-2" />
+              Leaderboard
             </Link>
           </li>
         </ul>
@@ -68,8 +60,7 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <div className="flex-1 p-6 text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Welcome To Your Dashboard</h1>
-        {/* Other content */}
+        <Outlet /> {/* Renders child route content */}
       </div>
     </div>
   );

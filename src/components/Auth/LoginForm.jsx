@@ -1,46 +1,47 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai"; // Importing eye icons
-import axios from "axios"; // Importing axios
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import axios from "axios";
 
 const LoginForm = () => {
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-  const [username, setUsername] = useState(""); // State for username
-  const [password, setPassword] = useState(""); // State for password
-  const [errorMessage, setErrorMessage] = useState(""); // State for error messages
-  const [successMessage, setSuccessMessage] = useState(""); // State for success messages
-  const navigate = useNavigate(); // To redirect user after successful login
+  const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
+  const navigate = useNavigate();
 
-  // Function to toggle the password visibility
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
 
-  // Function to handle form submission
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent page reload on form submission
-    setErrorMessage(""); // Clear previous error message
-    setSuccessMessage(""); // Clear previous success message
+    e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
+    setLoading(true); // Start spinner
 
     try {
-      // Sending POST request to the backend for login
-      const response = await axios.post("https://e-learn-ncux.onrender.com/auth/login", { username, password });
+      const response = await axios.post(
+        "https://e-learn-ncux.onrender.com/auth/login",
+        { username, password }
+      );
 
-      // If login is successful, store token (or user info) and navigate to a new page
-      if (response.data.success) {
-        // Example: Store token in local storage or context
+      if (response.data.message === "Login successful") {
         localStorage.setItem("authToken", response.data.token);
-
-        // Set success message and display it
         setSuccessMessage("Login successful!");
 
-        // Redirect user to dashboard or homepage after a short delay
         setTimeout(() => {
-          navigate("/dashboard"); // Adjust this path as per your requirement
-        }, 2000); // Redirect after 2 seconds
+          setLoading(false); // Stop spinner
+          navigate("/"); // Navigate to homepage
+        }, 2000); // Delay of 2 seconds
+      } else {
+        setLoading(false); // Stop spinner
+        setErrorMessage("Login failed. Please check your credentials.");
       }
     } catch (error) {
-      // Handling error from login API
+      setLoading(false); // Stop spinner
       if (error.response) {
         setErrorMessage(error.response.data.message || "Login failed. Please try again.");
       } else {
@@ -48,6 +49,15 @@ const LoginForm = () => {
       }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <p className="mt-4 text-indigo-600 font-semibold">Logging you in...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-50">
@@ -144,4 +154,3 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
-

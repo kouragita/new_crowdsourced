@@ -30,7 +30,7 @@ const Homepage = () => {
       <section id="features" className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <h3 className="text-2xl font-bold text-center text-gray-800">
-            Why Choose Learnify?
+            Why Choose CrowdSourced?
           </h3>
           <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-gray-100 p-6 rounded-lg text-center">
@@ -64,7 +64,7 @@ const Homepage = () => {
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
               <p className="italic text-gray-600">
-                "Learnify transformed the way I approach learning."
+                "CrowdSourced transformed the way I approach learning."
               </p>
               <h4 className="mt-4 font-bold text-gray-800">- John Doe</h4>
             </div>

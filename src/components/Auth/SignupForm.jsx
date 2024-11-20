@@ -1,68 +1,70 @@
 import React, { useState } from "react";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai"; // Importing eye icons
-import axios from "axios"; // Import axios
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
-  const navigate = useNavigate(); // Initialize useNavigate hook
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for confirm password visibility
-  const [username, setUsername] = useState(""); // Username state
-  const [email, setEmail] = useState(""); // Email state
-  const [password, setPassword] = useState(""); // Password state
-  const [confirmPassword, setConfirmPassword] = useState(""); // Confirm password state
-  const [error, setError] = useState(""); // Error state
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
 
-  // Function to toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
 
-  // Function to toggle confirm password visibility
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword((prevState) => !prevState);
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Clear previous errors
     setError("");
+    setLoading(true); // Start spinner
 
-    // Check if passwords match
     if (password !== confirmPassword) {
+      setLoading(false);
       setError("Passwords do not match.");
       return;
     }
 
-    // Prepare data for submission
-    const userData = {
-      username,
-      email,
-      password,
-    };
+    const userData = { username, email, password };
 
     try {
       const response = await axios.post("https://e-learn-ncux.onrender.com/auth/signup", userData);
-      console.log(response.data); // Handle success
-      // Navigate to the login page after successful signup
-      navigate("/login");
+      console.log(response.data);
+      setTimeout(() => {
+        setLoading(false); // Stop spinner
+        navigate("/login");
+      }, 2000); // Delay for 2 seconds
     } catch (error) {
+      setLoading(false); // Stop spinner
       if (error.response) {
-        if (error.response.status === 409) {
-          // Handle specific conflict error (e.g., username/email already exists)
-          setError("Username or email already exists. Please choose another.");
-        } else {
-          // Handle other errors
-          setError(error.response.data.message || "Error during sign up. Please try again.");
-        }
+        setError(
+          error.response.status === 409
+            ? "Username or email already exists. Please choose another."
+            : error.response.data.message || "Error during signup. Please try again."
+        );
       } else {
         setError("Network error. Please try again.");
       }
       console.error(error);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <p className="mt-4 text-indigo-600 font-semibold">Creating your account...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-50">
@@ -73,11 +75,7 @@ const SignupForm = () => {
         <p className="mt-2 text-sm text-gray-600 text-center">
           Join us and get started today
         </p>
-        {error && (
-          <div className="text-red-600 text-sm text-center mb-4">
-            {error}
-          </div>
-        )}
+        {error && <div className="text-red-600 text-sm text-center mb-4">{error}</div>}
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">
@@ -111,7 +109,7 @@ const SignupForm = () => {
             </label>
             <div className="relative">
               <input
-                type={showPassword ? "text" : "password"} // Toggle between text and password
+                type={showPassword ? "text" : "password"}
                 id="password"
                 placeholder="Enter your password"
                 value={password}
@@ -122,11 +120,7 @@ const SignupForm = () => {
                 onClick={togglePasswordVisibility}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
               >
-                {showPassword ? (
-                  <AiFillEyeInvisible className="text-gray-600" />
-                ) : (
-                  <AiFillEye className="text-gray-600" />
-                )}
+                {showPassword ? <AiFillEyeInvisible className="text-gray-600" /> : <AiFillEye className="text-gray-600" />}
               </span>
             </div>
           </div>
@@ -136,7 +130,7 @@ const SignupForm = () => {
             </label>
             <div className="relative">
               <input
-                type={showConfirmPassword ? "text" : "password"} // Toggle between text and password
+                type={showConfirmPassword ? "text" : "password"}
                 id="confirm-password"
                 placeholder="Confirm your password"
                 value={confirmPassword}
@@ -147,27 +141,8 @@ const SignupForm = () => {
                 onClick={toggleConfirmPasswordVisibility}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
               >
-                {showConfirmPassword ? (
-                  <AiFillEyeInvisible className="text-gray-600" />
-                ) : (
-                  <AiFillEye className="text-gray-600" />
-                )}
+                {showConfirmPassword ? <AiFillEyeInvisible className="text-gray-600" /> : <AiFillEye className="text-gray-600" />}
               </span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="terms"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="terms"
-                className="ml-2 block text-sm text-gray-800"
-              >
-                I agree to the terms and conditions
-              </label>
             </div>
           </div>
           <button
@@ -189,5 +164,3 @@ const SignupForm = () => {
 };
 
 export default SignupForm;
-
-
