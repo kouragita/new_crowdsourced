@@ -29,7 +29,8 @@ const LoginForm = () => {
       );
 
       if (response.data.message === "Login successful") {
-        localStorage.setItem("authToken", response.data.token);
+        localStorage.setItem("authToken", response.data.token); // Store auth token
+        localStorage.setItem("username", username); // Store username
         setSuccessMessage("Login successful!");
 
         setTimeout(() => {

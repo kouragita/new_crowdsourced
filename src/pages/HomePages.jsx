@@ -1,21 +1,41 @@
-import React from "react";
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Homepage = () => {
+  const [topLearners, setTopLearners] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTopLearners = async () => {
+      try {
+        const response = await axios.get("https://e-learn-ncux.onrender.com/api/leaderboard");
+        if (Array.isArray(response.data.leaderboard)) {
+          setTopLearners(response.data.leaderboard);
+        } else {
+          console.error("API did not return leaderboard data", response.data);
+        }
+      } catch (err) {
+        console.error("Error fetching leaderboard data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopLearners();
+  }, []);
+
   return (
     <div className="bg-gray-50 text-gray-800">
       {/* Hero Section */}
       <section className="bg-blue-50 py-20">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold text-blue-600">
-            Unlock Your Learning Potential
-          </h2>
+          <h2 className="text-4xl font-bold text-blue-600">Unlock Your Learning Potential</h2>
           <p className="mt-4 text-gray-600">
             Empower yourself with our easy-to-use learning platform designed for
             students, teachers, and institutions.
           </p>
           <div className="mt-6">
-            {/* Use Link to navigate to the signup page */}
             <Link
               to="/signup"
               className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg shadow-lg hover:bg-blue-700"
@@ -80,6 +100,66 @@ const Homepage = () => {
               </p>
               <h4 className="mt-4 font-bold text-gray-800">- Alex Johnson</h4>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Leaderboard Section */}
+      <section id="leaderboard" className="py-20 bg-gray-50 relative">
+        <div className="container mx-auto px-6">
+          <h3 className="text-2xl font-bold text-center text-gray-800 mb-6">
+            Top Learners
+          </h3>
+
+          {/* Top Learners (Blurred Effect) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {loading ? (
+              <div>Loading...</div>
+            ) : (
+              topLearners.slice(0, 3).map((learner, index) => (
+                <div
+                  key={index}
+                  className="bg-white p-6 rounded-lg shadow-lg text-center"
+                >
+                  <h4 className="font-bold text-gray-800">{learner.username}</h4>
+                  <p className="text-gray-600">{learner.total_points} points</p>
+                  {learner.badges.length > 0 && (
+                    <span className="text-sm text-yellow-600 font-semibold">
+                      {learner.badges.join(", ")}
+                    </span>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Blurred Learners */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            {loading ? (
+              <div>Loading...</div>
+            ) : (
+              topLearners.slice(3).map((learner, index) => (
+                <div
+                  key={index + 3}
+                  className="bg-white p-6 rounded-lg shadow-lg text-center opacity-50 cursor-not-allowed"
+                  style={{ filter: "blur(5px)" }}
+                >
+                  <h4 className="font-bold text-gray-800">Hidden for Privacy</h4>
+                  <p className="text-gray-600">Points: Hidden</p>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* View More Button */}
+          <div className="absolute inset-x-0 bottom-6 text-center w-full">
+            <Link
+              to="/dashboard/leaderboard"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg shadow-lg hover:bg-blue-700 transform hover:scale-110 transition duration-300"
+              style={{ zIndex: 10 }}
+            >
+              View More
+            </Link>
           </div>
         </div>
       </section>

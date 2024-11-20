@@ -1,45 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
 const Leaderboard = () => {
-  // State to store leaderboard data, pagination, loading, and errors
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1); // Pagination
-  const [totalPages, setTotalPages] = useState(1); // Total pages for pagination
-  const itemsPerPage = 10; // Number of items per page
 
-  // Fetch data from both APIs and combine them
   useEffect(() => {
     const fetchLeaderboardData = async () => {
       try {
-        // Fetch user names
-        const usersResponse = await fetch("https://e-learn-ncux.onrender.com/api/users");
-        if (!usersResponse.ok) throw new Error("Failed to fetch user names");
-        const usersData = await usersResponse.json();
+        const response = await fetch('https://e-learn-ncux.onrender.com/api/leaderboard');
+        if (!response.ok) throw new Error('Failed to fetch leaderboard data');
 
-        // Fetch points data
-        const pointsResponse = await fetch("https://e-learn-ncux.onrender.com/api/user-profiles");
-        if (!pointsResponse.ok) throw new Error("Failed to fetch user points");
-        const pointsData = await pointsResponse.json();
-
-        // Combine data by matching 'id'
-        const combinedData = usersData.map((user) => {
-          const userPoints = pointsData.find((profile) => profile.id === user.id); // Match by 'id'
-          return {
-            ...user,
-            points: userPoints ? userPoints.points : 0, // Default to 0 if points are missing
-          };
-        });
-
-        // Sort data by points in descending order
-        const sortedData = combinedData.sort((a, b) => b.points - a.points);
-
-        // Pagination: calculate total pages and slice data for the current page
-        setTotalPages(Math.ceil(sortedData.length / itemsPerPage));
-        const pageData = sortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-        setLeaderboard(pageData);
-
+        const data = await response.json();
+        setLeaderboard(data.leaderboard);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -48,60 +21,58 @@ const Leaderboard = () => {
     };
 
     fetchLeaderboardData();
-  }, [currentPage]); // Refetch when currentPage changes
-
-  // Pagination handler
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  }, []);
 
   if (loading) {
-    return <div className="text-center text-gray-800">Loading leaderboard...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-2xl font-semibold text-gray-800">Loading leaderboard...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center text-red-600">Error: {error}</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-2xl font-semibold text-red-600">Error: {error}</div>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-xl">
-      <h3 className="text-2xl font-bold text-gray-800 mb-4">Leaderboard</h3>
-      <table className="w-full table-auto border-collapse">
-        <thead>
-          <tr>
-            <th className="p-2 border-b text-left">Rank</th>
-            <th className="p-2 border-b text-left">Name</th>
-            <th className="p-2 border-b text-left">Points</th>
-          </tr>
-        </thead>
-        <tbody>
-          {leaderboard.map((player, index) => (
-            <tr key={player.id} className="hover:bg-gray-100">
-              <td className="p-2">{(currentPage - 1) * itemsPerPage + index + 1}</td> {/* Rank */}
-              <td className="p-2">{player.name || "Unknown"}</td> {/* Name with fallback */}
-              <td className="p-2">{player.points}</td> {/* Points */}
+    <div className="container mx-auto p-6">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Leaderboard</h2>
+        <table className="min-w-full table-auto">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-3 text-left text-lg font-semibold text-gray-700">Rank</th>
+              <th className="p-3 text-left text-lg font-semibold text-gray-700">Name</th>
+              <th className="p-3 text-left text-lg font-semibold text-gray-700">Points</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Pagination controls */}
-      <div className="flex justify-between mt-4">
-        <button
-          disabled={currentPage === 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-        >
-          Previous
-        </button>
-        <span>Page {currentPage} of {totalPages}</span>
-        <button
-          disabled={currentPage === totalPages}
-          onClick={() => handlePageChange(currentPage + 1)}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-        >
-          Next
-        </button>
+          </thead>
+          <tbody>
+            {leaderboard.map((player, index) => (
+              <tr
+                key={player.user_id}
+                className={`hover:bg-gray-50 ${
+                  index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                }`}
+              >
+                <td className="p-3 text-gray-800">{index + 1}</td>
+                <td className="p-3 text-gray-800 font-medium">
+                  {player.username}
+                  {player.badges.length > 0 && (
+                    <span className="ml-2 text-sm text-yellow-600 font-semibold">
+                      {player.badges.join(', ')}
+                    </span>
+                  )}
+                </td>
+                <td className="p-3 text-gray-800">{player.total_points}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

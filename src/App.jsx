@@ -34,7 +34,7 @@ const App = () => (
             <Route path="courses" element={<CoursesPage />} />
             <Route path="calendar" element={<Calendar />} />
             <Route path="leaderboard" element={<Leaderboard />} />
-            <Route path="modules/:pathId" element={<ModulesPage />} />
+            <Route path="modules/:id" element={<ModulesPage />} /> {/* Ensure route for modules */}
           </Route>
         </Routes>
       </main>
