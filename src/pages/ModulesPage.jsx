@@ -16,7 +16,8 @@ const ModulesPage = () => {
         const response = await axios.get(
           `https://e-learn-ncux.onrender.com/api/learning_paths/${id}/modules`
         );
-        setModules(response.data);
+        console.log('Fetched modules:', response.data);  // Check the fetched data
+        setModules(response.data); // Update state with the modules
       } catch (error) {
         setError("Failed to fetch modules. Please try again later.");
         console.error("Error fetching modules:", error);
@@ -28,7 +29,7 @@ const ModulesPage = () => {
     if (id) {
       fetchModules();
     }
-  }, [id]);
+  }, [id]); // Re-fetch if ID changes
 
   if (loading) {
     return (

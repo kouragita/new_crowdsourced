@@ -27,8 +27,8 @@ const Navbar = () => {
         </Link>
         <nav className="hidden md:flex space-x-6">
           <a href="#features" className="hover:text-blue-600">Features</a>
+          <a href="#leaderboard" className="hover:text-blue-600">Top Learners</a>
           <a href="#testimonials" className="hover:text-blue-600">Testimonials</a>
-          <a href="#contact" className="hover:text-blue-600">Contact</a>
         </nav>
         <div className="space-x-4">
           {isLoggedIn ? (

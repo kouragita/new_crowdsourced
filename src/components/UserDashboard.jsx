@@ -1,48 +1,18 @@
-// import React from "react";
-
-// const UserDashboard = () => {
-//   const courses = [
-//     { id: 1, title: "Introduction to Programming", status: "Enrolled" },
-//     { id: 2, title: "Data Structures and Algorithms", status: "Enrolled" },
-//     { id: 3, title: "Web Development", status: "Completed" },
-//   ];
-
-//   return (
-//     <div>
-//       <h3 className="text-xl font-semibold text-gray-800">Your Courses</h3>
-//       <div className="mt-6 bg-white p-6 rounded-lg shadow-md">
-//         <ul>
-//           {courses.map((course) => (
-//             <li key={course.id} className="flex justify-between items-center mt-4">
-//               <span className="text-gray-800">{course.title}</span>
-//               <span className="text-sm text-gray-600">{course.status}</span>
-//             </li>
-//           ))}
-//         </ul>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default UserDashboard;
-
-
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
 
 const UserDashboard = () => {
-  const { id } = useParams(); // Extract 'id' from URL
   const [learningPath, setLearningPath] = useState(null);
   const [modules, setModules] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const username = localStorage.getItem('username'); // Retrieve username from localStorage
+
   useEffect(() => {
-    if (!id) {
-      setError('Learning path ID is missing');
+    if (!username) {
+      setError('Username is missing');
       setLoading(false);
       return;
     }
@@ -51,27 +21,48 @@ const UserDashboard = () => {
       try {
         setLoading(true);
 
+        // Fetch User Learning Path details based on username
+        const userLearningPathResponse = await axios.get(`https://e-learn-ncux.onrender.com/api/user-learning-paths?username=${username}`);
+        console.log('User Learning Path Response:', userLearningPathResponse.data); // Log user learning path response
+
+        if (userLearningPathResponse.data.length === 0) {
+          setError('No learning path found for this user');
+          setLoading(false);
+          return;
+        }
+
+        const learningPathId = userLearningPathResponse.data[0].learning_path_id;
+        console.log("Learning Path ID for User:", learningPathId); // Log learning path ID
+
         // Fetch Learning Path details
-        const pathResponse = await axios.get(`https://e-learn-ncux.onrender.com/api/learning_paths/${id}`);
+        const pathResponse = await axios.get(`https://e-learn-ncux.onrender.com/api/learning_paths/${learningPathId}`);
         setLearningPath(pathResponse.data);
 
         // Fetch Modules associated with this learning path
-        const modulesResponse = await axios.get(`https://e-learn-ncux.onrender.com/api/modules?learning_path_id=${id}`);
-        setModules(modulesResponse.data);
+        const modulesResponse = await axios.get('https://e-learn-ncux.onrender.com/api/modules');
+        console.log('All Modules:', modulesResponse.data); // Log all modules to inspect
+
+        // Filter modules based on learning_path_id
+        const filteredModules = modulesResponse.data.filter(module => module.learning_path_id === learningPathId);
+        console.log('Filtered Modules:', filteredModules); // Log filtered modules
+
+        // Update state with filtered modules
+        setModules(filteredModules);
 
         // Fetch Quizzes associated with this learning path
-        const quizzesResponse = await axios.get(`https://e-learn-ncux.onrender.com/api/quizzes?learning_path_id=${id}`);
+        const quizzesResponse = await axios.get(`https://e-learn-ncux.onrender.com/api/quizzes?learning_path_id=${learningPathId}`);
         setQuizzes(quizzesResponse.data);
+
       } catch (error) {
         setError('Unable to fetch learning path details');
-        console.error("Error fetching learning path details:", error);
+        console.error('Error fetching learning path details:', error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchLearningPathDetails();
-  }, [id]);
+  }, [username]);
 
   if (loading) {
     return (

@@ -5,6 +5,7 @@ import axios from "axios";
 const Homepage = () => {
   const [topLearners, setTopLearners] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showArrow, setShowArrow] = useState(false);  // State to control arrow visibility
 
   useEffect(() => {
     const fetchTopLearners = async () => {
@@ -24,6 +25,30 @@ const Homepage = () => {
 
     fetchTopLearners();
   }, []);
+
+  // Track scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const windowHeight = window.innerHeight;
+
+      if (scrollPosition + windowHeight >= scrollHeight - 10) {
+        setShowArrow(true); // Show arrow when at the bottom
+      } else {
+        setShowArrow(false); // Hide arrow when not at the bottom
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" }); // Smooth scroll to top
+  };
 
   return (
     <div className="bg-gray-50 text-gray-800">
@@ -70,35 +95,6 @@ const Homepage = () => {
               <p className="mt-4 text-gray-600">
                 Tailor the platform to meet your unique learning needs.
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 bg-blue-50">
-        <div className="container mx-auto px-6">
-          <h3 className="text-2xl font-bold text-center text-gray-800">
-            What Our Users Say
-          </h3>
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-              <p className="italic text-gray-600">
-                "CrowdSourced transformed the way I approach learning."
-              </p>
-              <h4 className="mt-4 font-bold text-gray-800">- John Doe</h4>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-              <p className="italic text-gray-600">
-                "Our team collaboration improved significantly!"
-              </p>
-              <h4 className="mt-4 font-bold text-gray-800">- Jane Smith</h4>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-              <p className="italic text-gray-600">
-                "An essential platform for modern education."
-              </p>
-              <h4 className="mt-4 font-bold text-gray-800">- Alex Johnson</h4>
             </div>
           </div>
         </div>
@@ -160,6 +156,46 @@ const Homepage = () => {
             >
               View More
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Back to Top Arrow */}
+      {showArrow && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-110"
+          aria-label="Scroll to top"
+        >
+          ↑
+        </button>
+      )}
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-20 bg-blue-50">
+        <div className="container mx-auto px-6">
+          <h3 className="text-2xl font-bold text-center text-gray-800">
+            What Our Users Say
+          </h3>
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+              <p className="italic text-gray-600">
+                "CrowdSourced transformed the way I approach learning."
+              </p>
+              <h4 className="mt-4 font-bold text-gray-800">- John Doe</h4>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+              <p className="italic text-gray-600">
+                "Our team collaboration improved significantly!"
+              </p>
+              <h4 className="mt-4 font-bold text-gray-800">- Jane Smith</h4>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+              <p className="italic text-gray-600">
+                "An essential platform for modern education."
+              </p>
+              <h4 className="mt-4 font-bold text-gray-800">- Alex Johnson</h4>
+            </div>
           </div>
         </div>
       </section>

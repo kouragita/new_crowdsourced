@@ -16,10 +16,11 @@ const CoursesPage = () => {
         const response = await axios.get(
           "https://e-learn-ncux.onrender.com/api/learning_paths"
         );
+        console.log("API Response:", response); // Debugging: Log the response
         setLearningPaths(response.data);
       } catch (error) {
-        setError("Failed to fetch learning paths. Please try again later.");
         console.error("Error fetching learning paths:", error);
+        setError("Failed to fetch learning paths. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -27,6 +28,9 @@ const CoursesPage = () => {
 
     fetchLearningPaths();
   }, []);
+
+  // Log the learningPaths data to check if it's populated correctly
+  console.log("Learning Paths:", learningPaths);
 
   const totalPages = Math.ceil(learningPaths.length / itemsPerPage);
   const indexOfLastPath = currentPage * itemsPerPage;
@@ -46,10 +50,14 @@ const CoursesPage = () => {
     );
   }
 
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6 font-sans">
       <h1 className="text-3xl font-bold mb-4 text-gray-800">Courses</h1>
-      {error && <p className="text-red-500">{error}</p>}
+      {learningPaths.length === 0 && <p>No learning paths available.</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentPaths.length > 0 ? (

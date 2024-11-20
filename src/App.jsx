@@ -10,7 +10,7 @@ import Dashboard from './components/Dashboard';
 import UserProfile from './components/UserProfile.jsx';
 import UserDashboard from './components/UserDashboard.jsx';
 import Calendar from './components/Calendar.jsx';
-import CoursesPage from "./pages/CoursesPages.jsx";
+import CoursesPage from './pages/CoursesPages.jsx';
 import ModulesPage from './pages/ModulesPage.jsx';
 import Leaderboard from './components/LeaderBoard.jsx';
 
@@ -35,6 +35,7 @@ const App = () => (
             <Route path="calendar" element={<Calendar />} />
             <Route path="leaderboard" element={<Leaderboard />} />
             <Route path="modules/:id" element={<ModulesPage />} /> {/* Ensure route for modules */}
+            <Route path="user-dashboard/:id" element={<UserDashboard />} /> {/* User Dashboard route with ID */}
           </Route>
         </Routes>
       </main>
