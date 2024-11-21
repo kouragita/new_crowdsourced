@@ -45,7 +45,6 @@ const Dashboard = () => {
               Calendar
             </Link>
           </li>
-          {/* New Link for Leaderboard */}
           <li>
             <Link
               to="/dashboard/leaderboard"
@@ -53,6 +52,15 @@ const Dashboard = () => {
             >
               <FaTrophy className="inline-block mr-2" />
               Leaderboard
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/dashboard/admin"
+              className="w-full text-left p-2 rounded-lg hover:bg-blue-700"
+            >
+              <FaTachometerAlt className="inline-block mr-2" />
+              Admin Panel
             </Link>
           </li>
         </ul>

@@ -13,6 +13,7 @@ import Calendar from './components/Calendar.jsx';
 import CoursesPage from "./pages/CoursesPages.jsx";
 import ModulesPage from './pages/ModulesPage.jsx';
 import Leaderboard from './components/LeaderBoard.jsx';
+import AdminPanel from './components/Adminpanel.jsx'
 
 import './index.css';
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="calendar" element={<Calendar />} />
             <Route path="leaderboard" element={<Leaderboard />} />
             <Route path="modules/:id" element={<ModulesPage />} /> {/* Ensure route for modules */}
+            <Route path="admin" element={<AdminPanel />} />
           </Route>
         </Routes>
       </main>
