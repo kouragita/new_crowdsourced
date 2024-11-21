@@ -9,33 +9,70 @@ const UserDashboard = () => {
   const [selectedLearningPath, setSelectedLearningPath] = useState(null); // To store the selected learning path
   const [currentPage, setCurrentPage] = useState(1); // Pagination state
   const [itemsPerPage] = useState(5); // Items per page
+  const [loading, setLoading] = useState(true); // Loading state for users
 
   useEffect(() => {
     // Get the currently logged-in username from localStorage
     const loggedInUsername = localStorage.getItem("username");
     setCurrentUser(loggedInUsername);
 
+    if (!loggedInUsername) {
+      console.error("No logged-in user found in localStorage");
+      return;
+    }
+
     // Fetch all users from the API
     axios
       .get("https://e-learn-ncux.onrender.com/api/users")
-      .then((response) => setUsers(response.data))
-      .catch((error) => console.error("Error fetching users:", error));
+      .then((response) => {
+        console.log("Fetched users:", response.data); // Log fetched users to debug
+        setUsers(response.data);
+        setLoading(false); // Stop loading spinner after users are fetched
+      })
+      .catch((error) => {
+        console.error("Error fetching users:", error);
+        setLoading(false); // Stop loading spinner on error
+      });
   }, []);
 
+  useEffect(() => {
+    // Log the current user state and the users list
+    console.log("Current User:", currentUser);
+    console.log("All Users:", users);
+
+    if (currentUser) {
+      // Check if the logged-in user exists in the users array
+      const loggedInUser = users.find((user) => user.username === currentUser);
+      console.log("Logged-in User:", loggedInUser); // Log logged-in user to debug
+
+      // Check if the logged-in user has learning paths
+      if (loggedInUser && loggedInUser.learning_paths) {
+        console.log("Learning Paths:", loggedInUser.learning_paths); // Log learning paths
+      } else {
+        console.log("No learning paths found for this user");
+      }
+    }
+  }, [currentUser, users]);
+
   const viewDetails = (learningPath) => {
-    console.log(`Fetching modules for Learning Path: ${learningPath.title}`);
+    console.log(`Fetching modules for Learning Path ID: ${learningPath.learning_path_id}`);
+    
     // Set selected learning path
     setSelectedLearningPath(learningPath);
-    // Open the modal
     setIsModalOpen(true);
 
     // Fetch modules for the selected learning path
     axios
-      .get(`https://e-learn-ncux.onrender.com/api/modules?learning_path_id=${learningPath.learning_path_id}`)
+      .get(
+        `https://e-learn-ncux.onrender.com/api/learning_paths/${learningPath.learning_path_id}/modules`
+      )
       .then((response) => {
-        setModules(response.data);
+        console.log("Modules API Response:", response.data); // Log the response for debugging
+        setModules(response.data); // Update the modules state
       })
-      .catch((error) => console.error("Error fetching modules:", error));
+      .catch((error) => {
+        console.error("Error fetching modules:", error);
+      });
   };
 
   const closeModal = () => {
@@ -58,6 +95,20 @@ const UserDashboard = () => {
 
   // Filter the user data to match the currently logged-in user
   const loggedInUser = users.find((user) => user.username === currentUser);
+  console.log("Logged-in User (Filtered):", loggedInUser); // Log the filtered logged-in user
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <p className="mt-4 text-indigo-600 font-semibold">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!loggedInUser || !loggedInUser.learning_paths) {
+    return <div>Loading...</div>; // Show loading state while data is being fetched
+  }
 
   // Pagination logic for the modules
   const totalPages = Math.ceil(modules.length / itemsPerPage);
@@ -79,11 +130,14 @@ const UserDashboard = () => {
 
       {/* User's Learning Paths */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {loggedInUser && loggedInUser.learning_paths.length > 0 ? (
+        {loggedInUser.learning_paths.length > 0 ? (
           loggedInUser.learning_paths.map((path) => (
-            <div key={path.learning_path_id} className="bg-white shadow-lg rounded-lg p-4">
+            <div
+              key={path.learning_path_id}
+              className="bg-white shadow-lg rounded-lg p-4"
+            >
               <h2 className="text-xl font-bold text-gray-700">
-                {path.learning_path.title}
+                {path.learning_path.title} {/* Use correct path property */}
               </h2>
               <p className="text-sm text-gray-500 mb-4">
                 Date Enrolled:{" "}
@@ -91,7 +145,7 @@ const UserDashboard = () => {
               </p>
               <button
                 className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-                onClick={() => viewDetails(path.learning_path)}
+                onClick={() => viewDetails(path)}
               >
                 View Details
               </button>
@@ -111,10 +165,10 @@ const UserDashboard = () => {
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
             <h2 className="text-2xl font-bold text-gray-700 mb-4">
-              Modules for {selectedLearningPath.title}
+              Modules for {selectedLearningPath.learning_path.title} {/* Correctly use the title */}
             </h2>
 
-            {/* Grid to display modules like in CoursesPage */}
+            {/* Grid to display modules */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentModules.length > 0 ? (
                 currentModules.map((module) => (
@@ -137,7 +191,9 @@ const UserDashboard = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500">No modules available for this path.</p>
+                <p className="text-gray-500">
+                  No modules available for this path.
+                </p>
               )}
             </div>
 
@@ -160,7 +216,7 @@ const UserDashboard = () => {
 
             <button
               onClick={closeModal}
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+              className="mt-4 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition"
             >
               Close
             </button>

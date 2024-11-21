@@ -8,9 +8,10 @@ const CoursesPage = () => {
   const [itemsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [isTableVisible, setIsTableVisible] = useState(false); // Track if table is visible
-  const [selectedPathId, setSelectedPathId] = useState(null); // Store the selected learning path id
+  const [isTableVisible, setIsTableVisible] = useState(false); // Track table visibility
+  const [selectedPathId, setSelectedPathId] = useState(null); // Store selected learning path ID
 
+  // Fetch learning paths on component mount
   useEffect(() => {
     const fetchLearningPaths = async () => {
       try {
@@ -41,10 +42,11 @@ const CoursesPage = () => {
     setCurrentPage(pageNumber);
   };
 
+  // Fetch modules for a specific learning path
   const fetchModules = async (learningPathId) => {
     try {
       const response = await axios.get(
-        `https://e-learn-ncux.onrender.com/api/modules?learning_path_id=${learningPathId}`
+        `https://e-learn-ncux.onrender.com/api/learning_paths/${learningPathId}/modules`
       );
       setModules(response.data);
     } catch (error) {
@@ -52,27 +54,30 @@ const CoursesPage = () => {
     }
   };
 
+  // Handle "View Details" click
   const handleViewDetails = (learningPathId) => {
+    if (!learningPathId) {
+      console.error("Invalid learning path ID");
+      return;
+    }
     setSelectedPathId(learningPathId);
     fetchModules(learningPathId);
     setIsTableVisible(true);
-    // Scroll smoothly to the table
+
+    // Smooth scroll to modules table
     setTimeout(() => {
       document.getElementById("modulesTable").scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
-    }, 100); // Added timeout to ensure the state change happens before scrolling
+    }, 100);
   };
 
+  // Handle closing the modules table
   const closeTable = () => {
     setIsTableVisible(false);
     setModules([]);
-    // Scroll back to the top of the page
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   if (loading) {
@@ -91,12 +96,12 @@ const CoursesPage = () => {
     <div className="max-w-4xl mx-auto p-6 font-sans">
       <h1 className="text-3xl font-bold mb-4 text-gray-800">Courses</h1>
 
+      {/* Learning Paths Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentPaths.map((path) => (
           <div
             key={path.id}
             className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-            aria-label={`Learning path: ${path.title}`}
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-3">
@@ -116,7 +121,6 @@ const CoursesPage = () => {
                     className="h-4 w-4 text-yellow-400 fill-current"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    fill="currentColor"
                   >
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                   </svg>
@@ -125,26 +129,24 @@ const CoursesPage = () => {
                   </span>
                 </div>
               </div>
-
               <h2 className="text-xl font-semibold text-gray-700 mb-2">
                 {path.title}
               </h2>
-              <p className="text-gray-600 mb-4 line-clamp-2">{path.description}</p>
-
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => handleViewDetails(path.id)} // Trigger view details
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors"
-                >
-                  View Details
-                </button>
-              </div>
+              <p className="text-gray-600 mb-4 line-clamp-2">
+                {path.description}
+              </p>
+              <button
+                onClick={() => handleViewDetails(path.id)}
+                className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors"
+              >
+                View Details
+              </button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Pagination controls */}
+      {/* Pagination Controls */}
       <div className="flex justify-center mt-6">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
@@ -204,7 +206,10 @@ const CoursesPage = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" className="px-4 py-2 text-center text-gray-500">
+                  <td
+                    colSpan="3"
+                    className="px-4 py-2 text-center text-gray-500"
+                  >
                     No modules available
                   </td>
                 </tr>

@@ -11,8 +11,8 @@ import UserProfile from './components/UserProfile.jsx';
 import UserDashboard from './components/UserDashboard.jsx';
 import Calendar from './components/Calendar.jsx';
 import CoursesPage from './pages/CoursesPages.jsx';
-// import ModulesPage from './pages/ModulesPage.jsx';
 import Leaderboard from './components/LeaderBoard.jsx';
+import AdminPanel from './components/AdminDashboard.jsx';
 
 import './index.css';
 
@@ -34,8 +34,8 @@ const App = () => (
             <Route path="courses" element={<CoursesPage />} />
             <Route path="calendar" element={<Calendar />} />
             <Route path="leaderboard" element={<Leaderboard />} />
-            {/* <Route path="modules/:id" element={<ModulesPage />} /> */}
             <Route path="user-dashboard/:id" element={<UserDashboard />} /> {/* User Dashboard route with ID */}
+            <Route path="admin" element={<AdminPanel />} />
           </Route>
         </Routes>
       </main>
