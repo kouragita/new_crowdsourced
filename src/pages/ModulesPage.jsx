@@ -1,70 +1,49 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+// import { useParams } from "react-router-dom"; // Import useParams
 
-const ModulesPage = () => {
-  const { id } = useParams(); // Get the learning path ID from the URL
-  const [modules, setModules] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+// const ModulesPage = () => {
+//   const { learningPathId } = useParams(); // Get the learningPathId from the URL
+//   const [modules, setModules] = useState([]);
 
-  useEffect(() => {
-    console.log('Module Path ID:', id); // Debugging the path ID
-    const fetchModules = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(
-          `https://e-learn-ncux.onrender.com/api/learning_paths/${id}/modules`
-        );
-        console.log('Fetched modules:', response.data);  // Check the fetched data
-        setModules(response.data); // Update state with the modules
-      } catch (error) {
-        setError("Failed to fetch modules. Please try again later.");
-        console.error("Error fetching modules:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+//   useEffect(() => {
+//     // Fetch modules based on the learning path ID
+//     axios
+//       .get(`https://e-learn-ncux.onrender.com/api/modules?learning_path_id=${learningPathId}`)
+//       .then((response) => {
+//         setModules(response.data);
+//       })
+//       .catch((error) => console.error("Error fetching modules:", error));
+//   }, [learningPathId]);
 
-    if (id) {
-      fetchModules();
-    }
-  }, [id]); // Re-fetch if ID changes
+//   return (
+//     <div className="bg-gray-100 min-h-screen p-6">
+//       <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+//         Modules for Learning Path ID: {learningPathId}
+//       </h1>
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
+//       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+//         {modules.length > 0 ? (
+//           modules.map((module) => (
+//             <div key={module.id} className="bg-white shadow-lg rounded-lg p-4">
+//               <h2 className="text-xl font-bold text-gray-700">{module.title}</h2>
+//               <p className="text-gray-600">{module.description}</p>
+//               <a
+//                 href={module.resources[0]?.url}
+//                 target="_blank"
+//                 rel="noopener noreferrer"
+//                 className="text-blue-500 mt-2 inline-block"
+//               >
+//                 {module.resources[0]?.title}
+//               </a>
+//             </div>
+//           ))
+//         ) : (
+//           <p className="text-gray-500">No modules available for this learning path.</p>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
 
-  return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4">Modules for Path {id}</h1>
-      {error && <p className="text-red-500">{error}</p>}
-
-      <div className="space-y-6">
-        {modules.length > 0 ? (
-          modules.map((module) => (
-            <div
-              key={module.id}
-              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-            >
-              <div className="p-6">
-                <h2 className="text-xl font-semibold text-gray-700 mb-2">
-                  {module.title}
-                </h2>
-                <p className="text-gray-600">{module.description}</p>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No modules available for this learning path.</p>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default ModulesPage;
+// export default ModulesPage;

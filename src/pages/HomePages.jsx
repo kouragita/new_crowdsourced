@@ -5,7 +5,7 @@ import axios from "axios";
 const Homepage = () => {
   const [topLearners, setTopLearners] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showArrow, setShowArrow] = useState(false);  // State to control arrow visibility
+  const [showArrow, setShowArrow] = useState(false); // State to control arrow visibility
 
   useEffect(() => {
     const fetchTopLearners = async () => {
@@ -107,45 +107,46 @@ const Homepage = () => {
             Top Learners
           </h3>
 
-          {/* Top Learners (Blurred Effect) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {loading ? (
-              <div>Loading...</div>
-            ) : (
-              topLearners.slice(0, 3).map((learner, index) => (
-                <div
-                  key={index}
-                  className="bg-white p-6 rounded-lg shadow-lg text-center"
-                >
-                  <h4 className="font-bold text-gray-800">{learner.username}</h4>
-                  <p className="text-gray-600">{learner.total_points} points</p>
-                  {learner.badges.length > 0 && (
-                    <span className="text-sm text-yellow-600 font-semibold">
-                      {learner.badges.join(", ")}
-                    </span>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+              <p className="ml-4 text-blue-600 font-semibold">Fetching leaderboard...</p>
+            </div>
+          ) : (
+            <>
+              {/* Top Learners */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {topLearners.slice(0, 3).map((learner, index) => (
+                  <div
+                    key={index}
+                    className="bg-white p-6 rounded-lg shadow-lg text-center"
+                  >
+                    <h4 className="font-bold text-gray-800">{learner.username}</h4>
+                    <p className="text-gray-600">{learner.total_points} points</p>
+                    {learner.badges.length > 0 && (
+                      <span className="text-sm text-yellow-600 font-semibold">
+                        {learner.badges.join(", ")}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
 
-          {/* Blurred Learners */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-            {loading ? (
-              <div>Loading...</div>
-            ) : (
-              topLearners.slice(3).map((learner, index) => (
-                <div
-                  key={index + 3}
-                  className="bg-white p-6 rounded-lg shadow-lg text-center opacity-50 cursor-not-allowed"
-                  style={{ filter: "blur(5px)" }}
-                >
-                  <h4 className="font-bold text-gray-800">Hidden for Privacy</h4>
-                  <p className="text-gray-600">Points: Hidden</p>
-                </div>
-              ))
-            )}
-          </div>
+              {/* Blurred Learners */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                {topLearners.slice(3).map((learner, index) => (
+                  <div
+                    key={index + 3}
+                    className="bg-white p-6 rounded-lg shadow-lg text-center opacity-50 cursor-not-allowed"
+                    style={{ filter: "blur(5px)" }}
+                  >
+                    <h4 className="font-bold text-gray-800">Hidden for Privacy</h4>
+                    <p className="text-gray-600">Points: Hidden</p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
           {/* View More Button */}
           <div className="absolute inset-x-0 bottom-6 text-center w-full">
@@ -182,7 +183,7 @@ const Homepage = () => {
               <p className="italic text-gray-600">
                 "CrowdSourced transformed the way I approach learning."
               </p>
-              <h4 className="mt-4 font-bold text-gray-800">- John Doe</h4>
+              <h4 className="mt-4 font-bold text-gray-800">- John Kamau</h4>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
               <p className="italic text-gray-600">
