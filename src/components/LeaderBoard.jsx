@@ -25,8 +25,9 @@ const Leaderboard = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-2xl font-semibold text-gray-800">Loading leaderboard...</div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <p className="mt-4 text-indigo-600 font-semibold">Loading leaderboard...</p>
       </div>
     );
   }
@@ -55,9 +56,7 @@ const Leaderboard = () => {
             {leaderboard.map((player, index) => (
               <tr
                 key={player.user_id}
-                className={`hover:bg-gray-50 ${
-                  index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                }`}
+                className={`hover:bg-gray-50 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
               >
                 <td className="p-3 text-gray-800">{index + 1}</td>
                 <td className="p-3 text-gray-800 font-medium">
