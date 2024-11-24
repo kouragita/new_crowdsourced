@@ -29,14 +29,24 @@ const LoginForm = () => {
       );
 
       if (response.data.message === "Login successful") {
-        localStorage.setItem("authToken", response.data.token); // Store auth token
+        const { token, isAdmin } = response.data;
+
+        localStorage.setItem("authToken", token); // Store auth token
         localStorage.setItem("username", username); // Store username
         setSuccessMessage("Login successful!");
 
-        setTimeout(() => {
-          setLoading(false); // Stop spinner
-          navigate("/"); // Navigate to homepage
-        }, 2000); // Delay of 2 seconds
+        // Check if the user is an admin
+        if (isAdmin) {
+          setTimeout(() => {
+            setLoading(false); // Stop spinner
+            navigate("/admin"); // Navigate to admin panel
+          }, 2000); // Delay of 2 seconds
+        } else {
+          setTimeout(() => {
+            setLoading(false); // Stop spinner
+            navigate("/"); // Navigate to homepage
+          }, 2000); // Delay of 2 seconds
+        }
       } else {
         setLoading(false); // Stop spinner
         setErrorMessage("Login failed. Please check your credentials.");
