@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import Navbar from './components/Shared/Navbar';
 import Footer from './components/Shared/Footer';
 import Home from './pages/HomePages.jsx';
@@ -15,6 +16,11 @@ import Leaderboard from './components/LeaderBoard.jsx';
 import AdminPanel from './components/AdminDashboard.jsx';
 
 import './index.css';
+
+const isAdmin = () => {
+  const userRole = localStorage.getItem('role'); // Assuming role is stored in localStorage
+  return userRole === 'admin';
+};
 
 const App = () => (
   <Router>
@@ -36,6 +42,12 @@ const App = () => (
             <Route path="leaderboard" element={<Leaderboard />} />
             <Route path="user-dashboard/:id" element={<UserDashboard />} /> {/* User Dashboard route with ID */}
             <Route path="admin" element={<AdminPanel />} />
+
+            <Route
+              path="admin"
+              element={isAdmin() ? <AdminPanel /> : <Navigate to="/dashboard" />}
+            />
+
           </Route>
         </Routes>
       </main>
