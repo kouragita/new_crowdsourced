@@ -1,0 +1,181 @@
+/* Calendar.css - Responsive styles for react-calendar */
+
+.react-calendar {
+  width: 100%;
+  border: none !important;
+  font-family: inherit;
+}
+
+.react-calendar__tile {
+  max-width: none !important;
+  border: 1px solid #e5e7eb;
+  padding: 8px 4px;
+  background: white;
+  transition: all 0.2s ease;
+  position: relative;
+  min-height: 60px;
+}
+
+.react-calendar__tile:hover {
+  background-color: #f3f4f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+.react-calendar__tile--active {
+  background: #3b82f6 !important;
+  color: white !important;
+  border-color: #3b82f6 !important;
+}
+
+.react-calendar__tile--now {
+  background: #dbeafe !important;
+  color: #1e40af !important;
+  border-color: #3b82f6 !important;
+}
+
+.react-calendar__navigation button {
+  min-width: 44px;
+  background: none;
+  border: none;
+  color: #374151;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.react-calendar__navigation button:hover {
+  background-color: #f3f4f6;
+  color: #3b82f6;
+}
+
+.react-calendar__navigation button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.react-calendar__month-view__weekdays {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 12px;
+  color: #6b7280;
+  padding: 8px 0;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 8px;
+  text-align: center;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .react-calendar__tile {
+    padding: 4px 2px;
+    min-height: 45px;
+    font-size: 14px;
+  }
+  
+  .react-calendar__navigation button {
+    min-width: 40px;
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+  
+  .react-calendar__month-view__weekdays {
+    font-size: 10px;
+    padding: 4px 0;
+  }
+  
+  .react-calendar__month-view__weekdays__weekday {
+    padding: 4px;
+  }
+  
+  .react-calendar__navigation__label {
+    font-size: 16px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .react-calendar__tile {
+    padding: 2px 1px;
+    min-height: 35px;
+    font-size: 12px;
+  }
+  
+  .react-calendar__navigation button {
+    min-width: 35px;
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+  
+  .react-calendar__month-view__weekdays {
+    font-size: 9px;
+  }
+  
+  .react-calendar__navigation__label {
+    font-size: 14px;
+  }
+}
+
+/* Calendar responsive wrapper */
+.calendar-responsive {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Ensure calendar tiles are properly sized on all devices */
+.react-calendar__month-view__days__day {
+  flex-basis: calc(100% / 7);
+  max-width: calc(100% / 7);
+}
+
+/* Hide scrollbars but keep functionality */
+.calendar-container {
+  overflow-x: auto;
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.calendar-container::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
+}
+
+/* Additional responsive utilities */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Touch-friendly button sizes for mobile */
+@media (max-width: 1024px) {
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  input, select, textarea {
+    min-height: 44px;
+  }
+}
+
+/* Enhanced mobile navigation */
+@media (max-width: 640px) {
+  .react-calendar__navigation {
+    margin-bottom: 8px;
+  }
+  
+  .react-calendar__navigation button {
+    flex: 1;
+    margin: 0 2px;
+  }
+}
+
+/* Improved tile content spacing for mobile */
+@media (max-width: 768px) {
+  .react-calendar__tile abbr {
+    font-size: 12px;
+  }
+}

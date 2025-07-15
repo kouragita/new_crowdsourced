@@ -1,0 +1,216 @@
+{
+  "name": "CrowdSourced Learning Platform",
+  "short_name": "CrowdSourced",
+  "description": "Empower yourself with our easy-to-use learning platform designed for students, teachers, and institutions worldwide.",
+  "theme_color": "#2563eb",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "start_url": "/",
+  "id": "crowdsourced-learning-platform",
+  "categories": ["education", "productivity", "learning"],
+  "lang": "en",
+  "dir": "ltr",
+  
+  "icons": [
+    {
+      "src": "pwa-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "screenshot-narrow-home.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home - Welcome to CrowdSourced Learning Platform"
+    },
+    {
+      "src": "screenshot-narrow-dashboard.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard - Your Learning Progress Overview"
+    },
+    {
+      "src": "screenshot-narrow-courses-intro.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Courses - Course Introduction and Overview"
+    },
+    {
+      "src": "screenshot-narrow-courses-outline.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Courses - Detailed Course Outline and Curriculum"
+    },
+    {
+      "src": "screenshot-narrow-leaderboard.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Leaderboard - Compete and Track Rankings"
+    },
+    {
+      "src": "screenshot-narrow-testmonies.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Testimonials - Success Stories from Our Learners"
+    },
+    {
+      "src": "screenshot-wide-home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Home - Welcome to CrowdSourced Learning Platform"
+    },
+    {
+      "src": "screenshot-wide-dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard - Comprehensive Learning Analytics"
+    },
+    {
+      "src": "screenshot-wide-courses-intro.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Courses - Explore Our Course Catalog"
+    },
+    {
+      "src": "screenshot-wide-courses-outline.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Courses - Detailed Learning Path and Structure"
+    },
+    {
+      "src": "screenshot-wide-leaderboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Leaderboard - Global Learning Competition"
+    },
+    {
+      "src": "screenshot-wide-testmonies.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Testimonials - Learner Success Stories and Reviews"
+    }
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Go to your learning dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "short_name": "Courses",
+      "description": "Browse available courses",
+      "url": "/dashboard/courses",
+      "icons": [
+        {
+          "src": "pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Leaderboard",
+      "short_name": "Leaderboard",
+      "description": "View the learning leaderboard",
+      "url": "/dashboard/leaderboard",
+      "icons": [
+        {
+          "src": "pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Calendar",
+      "short_name": "Calendar",
+      "description": "Open your learning calendar",
+      "url": "/dashboard/calendar",
+      "icons": [
+        {
+          "src": "pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  
+  "protocol_handlers": [
+    {
+      "protocol": "web+crowdsourced",
+      "url": "/handle?protocol=%s"
+    }
+  ],
+  
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}
