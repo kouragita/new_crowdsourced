@@ -14,16 +14,16 @@
     <meta property="og:url" content="https://new-crowdsourced.onrender.com/">
     <meta property="og:title" content="CrowdSourced - Learning Platform">
     <meta property="og:description" content="Empower yourself with our easy-to-use learning platform designed for students, teachers, and institutions.">
-    <meta property="og:image" content="/og-image.png">
+    <meta property="og:image" content="/screenshot-wide-home.png">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://new-crowdsourced.onrender.com/">
     <meta property="twitter:title" content="CrowdSourced - Learning Platform">
     <meta property="twitter:description" content="Empower yourself with our easy-to-use learning platform designed for students, teachers, and institutions.">
-    <meta property="twitter:image" content="/og-image.png">
+    <meta property="twitter:image" content="/screenshot-wide-home.png">
     
-    <!-- PWA Meta Tags - FIXED -->
+    <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#2563eb">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -40,16 +40,34 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2563eb">
     
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://e-learn-ncux.onrender.com">
     <link rel="dns-prefetch" href="https://e-learn-ncux.onrender.com">
     
-    <!-- Performance optimizations - FIXED: Use modulepreload for ES modules -->
+    <!-- Performance optimizations -->
     <link rel="modulepreload" href="/src/main.jsx" crossorigin>
     
     <!-- Additional PWA meta for iOS -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.jpg">
+    
+    <!-- CSP Meta Tag - Allow inline styles but restrict scripts -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self'; 
+      script-src 'self' 'wasm-unsafe-eval' 'inline-speculation-rules'; 
+      style-src 'self' 'unsafe-inline'; 
+      img-src 'self' data: blob: https:; 
+      font-src 'self' data:; 
+      connect-src 'self' https://e-learn-ncux.onrender.com wss://e-learn-ncux.onrender.com; 
+      frame-src 'none'; 
+      object-src 'none'; 
+      base-uri 'self';
+      form-action 'self';
+      upgrade-insecure-requests;
+    ">
     
     <style>
       /* Loading screen styles */
@@ -102,42 +120,12 @@
     </div>
     
     <div id="root"></div>
+    
+    <!-- Main app module -->
     <script type="module" src="/src/main.jsx"></script>
     
-    <script>
-      // Hide loading screen once app is loaded
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          const loadingScreen = document.getElementById('loading-screen');
-          if (loadingScreen) {
-            loadingScreen.classList.add('fade-out');
-            setTimeout(() => {
-              loadingScreen.style.display = 'none';
-            }, 500);
-          }
-        }, 1000);
-      });
-      
-      // PWA install prompt - FIXED: Better error handling
-      let deferredPrompt;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        console.log('PWA install prompt available');
-      });
-
-      // FIXED: Handle service worker registration errors
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-              console.log('SW registered: ', registration);
-            })
-            .catch(registrationError => {
-              console.log('SW registration failed: ', registrationError);
-            });
-        });
-      }
-    </script>
+    <!-- External JS files for functionality that was inline -->
+    <script type="module" src="/js/app-loader.js"></script>
+    <script type="module" src="/js/pwa-handler.js"></script>
   </body>
 </html>
