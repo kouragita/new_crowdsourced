@@ -11,7 +11,8 @@ export default defineConfig({
         'favicon.ico', 
         'apple-touch-icon.png', 
         'safari-pinned-tab.svg',
-        'screenshot-*.png'
+        'screenshot-*.png',
+        'js/*.js'
       ],
       manifest: {
         name: 'CrowdSourced Learning Platform',
@@ -207,12 +208,60 @@ export default defineConfig({
               }
             ]
           }
-        ]
+        ],
+        
+        // Enhanced PWA features
+        share_target: {
+          action: '/share',
+          method: 'GET',
+          params: {
+            title: 'title',
+            text: 'text',
+            url: 'url'
+          }
+        },
+        
+        protocol_handlers: [
+          {
+            protocol: 'web+crowdsourced',
+            url: '/handle?protocol=%s'
+          }
+        ],
+        
+        prefer_related_applications: false,
+        edge_side_panel: {
+          preferred_width: 400
+        },
+        handle_links: 'preferred',
+        launch_handler: {
+          client_mode: 'navigate-existing'
+        }
       },
       
-      // FIXED: Simplified Workbox configuration
+      // Enhanced Workbox configuration
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,gif,webp,woff,woff2,ttf,eot}'],
+        globPatterns: [
+          '**/*.{js,css,html,ico,png,svg,jpg,jpeg,gif,webp,woff,woff2,ttf,eot}',
+          'js/*.js'
+        ],
+        
+        // Add screenshot files to precache
+        additionalManifestEntries: [
+          { url: 'screenshot-narrow-home.png', revision: null },
+          { url: 'screenshot-narrow-dashboard.png', revision: null },
+          { url: 'screenshot-narrow-courses-intro.png', revision: null },
+          { url: 'screenshot-narrow-courses-outline.png', revision: null },
+          { url: 'screenshot-narrow-leaderboard.png', revision: null },
+          { url: 'screenshot-narrow-testmonies.png', revision: null },
+          { url: 'screenshot-wide-home.png', revision: null },
+          { url: 'screenshot-wide-dashboard.png', revision: null },
+          { url: 'screenshot-wide-courses-intro.png', revision: null },
+          { url: 'screenshot-wide-courses-outline.png', revision: null },
+          { url: 'screenshot-wide-leaderboard.png', revision: null },
+          { url: 'screenshot-wide-testmonies.png', revision: null },
+          { url: 'js/app-loader.js', revision: null },
+          { url: 'js/pwa-handler.js', revision: null }
+        ],
         
         runtimeCaching: [
           // API caching strategy
@@ -222,10 +271,13 @@ export default defineConfig({
             options: {
               cacheName: 'api-cache',
               expiration: {
-                maxEntries: 50,
+                maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 // 24 hours
               },
-              networkTimeoutSeconds: 3
+              networkTimeoutSeconds: 5,
+              cacheKeyWillBeUsed: async ({ request }) => {
+                return `${request.url}?timestamp=${Date.now()}`
+              }
             }
           },
           
@@ -236,7 +288,7 @@ export default defineConfig({
             options: {
               cacheName: 'images-cache',
               expiration: {
-                maxEntries: 100,
+                maxEntries: 200,
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
               }
             }
@@ -249,6 +301,19 @@ export default defineConfig({
             options: {
               cacheName: 'fonts-cache',
               expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              }
+            }
+          },
+          
+          // Google Fonts caching
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: {
                 maxEntries: 30,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               }
@@ -258,12 +323,16 @@ export default defineConfig({
         
         // Skip waiting for new service worker
         skipWaiting: true,
-        clientsClaim: true
+        clientsClaim: true,
+        
+        // Cleanup outdated caches
+        cleanupOutdatedCaches: true
       },
       
       // Development options
       devOptions: {
-        enabled: false
+        enabled: process.env.NODE_ENV === 'development',
+        type: 'module'
       }
     })
   ],
@@ -272,7 +341,12 @@ export default defineConfig({
   server: {
     host: true,
     port: 3000,
-    cors: true
+    cors: true,
+    headers: {
+      // Enhanced security headers
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Opener-Policy': 'same-origin'
+    }
   },
   
   // Build configuration
@@ -293,6 +367,18 @@ export default defineConfig({
           ui: ['react-intersection-observer', 'react-loading-skeleton']
         }
       }
+    },
+    
+    // Optimize dependencies
+    optimizeDeps: {
+      include: [
+        'react',
+        'react-dom',
+        'react-router-dom',
+        'framer-motion',
+        'axios',
+        'react-hot-toast'
+      ]
     }
   },
   
