@@ -149,8 +149,6 @@ const SignupForm = () => {
         newErrors.username = "Username is required";
       } else if (formData.username.length < 3) {
         newErrors.username = "Username must be at least 3 characters";
-      } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
-        newErrors.username = "Username can only contain letters, numbers, and underscores";
       } else if (usernameAvailable === false) {
         newErrors.username = "Username is already taken";
       }
@@ -167,8 +165,8 @@ const SignupForm = () => {
     if (step >= 2) {
       if (!formData.password) {
         newErrors.password = "Password is required";
-      } else if (passwordStrength < 4) {
-        newErrors.password = "Password must meet at least 4 requirements";
+      } else if (passwordStrength < 3) {
+        newErrors.password = "Password is too weak. Please meet more requirements.";
       }
 
       if (!formData.confirmPassword) {
@@ -178,7 +176,7 @@ const SignupForm = () => {
       }
 
       if (!formData.agreeToTerms) {
-        newErrors.agreeToTerms = "You must agree to the terms and conditions";
+        newErrors.agreeToTerms = "You must agree to the Terms and Conditions";
       }
     }
 
@@ -226,7 +224,7 @@ const SignupForm = () => {
 
     try {
       const response = await axios.post(
-        "https://e-learn-ncux.onrender.com/auth/register",
+        `${import.meta.env.VITE_API_BASE_URL}/auth/signup`,
         {
           username: formData.username.trim(),
           email: formData.email.trim(),
@@ -241,21 +239,24 @@ const SignupForm = () => {
         }
       );
 
-      if (response.data && response.data.access_token) {
+      // Updated to match new backend response format
+      if (response.data && response.data.token && response.data.user) {
         const userData = {
-          username: formData.username.trim(),
-          email: formData.email.trim(),
-          firstName: formData.firstName.trim(),
-          lastName: formData.lastName.trim(),
-          role: 'student',
-          totalPoints: 0,
-          currentStreak: 0,
-          badges: [],
-          profilePicture: null
+          username: response.data.user.username,
+          email: response.data.user.email,
+          firstName: response.data.user.first_name || formData.firstName.trim(),
+          lastName: response.data.user.last_name || formData.lastName.trim(),
+          role: response.data.user.role || 'student',
+          totalPoints: response.data.user.total_points || 0,
+          currentStreak: response.data.user.current_streak || 0,
+          badges: response.data.user.badges || [],
+          profilePicture: response.data.user.profile_picture || null,
+          id: response.data.user.id,
+          roleId: response.data.user.role_id
         };
 
-        // Login user through context
-        login(userData, response.data.access_token);
+        // Login user through context with auto-login token
+        login(userData, response.data.token);
 
         toast.success("Account created successfully! Welcome to CrowdSourced!");
         
@@ -410,7 +411,7 @@ const SignupForm = () => {
               </div>
 
               {/* Divider */}
-              <div className="relative">
+              <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
@@ -421,29 +422,29 @@ const SignupForm = () => {
             </div>
           )}
 
-          {/* General Error */}
-          {errors.general && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center mb-6"
-            >
-              <FaExclamationTriangle className="w-5 h-5 mr-2 flex-shrink-0" />
-              <span className="text-sm">{errors.general}</span>
-            </motion.div>
-          )}
-
           {/* Signup Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* General Error */}
+            {errors.general && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center"
+              >
+                <FaExclamationTriangle className="w-5 h-5 mr-2 flex-shrink-0" />
+                <span className="text-sm">{errors.general}</span>
+              </motion.div>
+            )}
+
             <AnimatePresence mode="wait">
-              {currentStep === 1 && (
+              {currentStep === 1 ? (
                 <motion.div
                   key="step1"
                   initial={{ opacity: 0, x: 50 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -50 }}
                   transition={{ duration: 0.3 }}
-                  className="space-y-6"
+                  className="space-y-4"
                 >
                   {/* Name Fields */}
                   <div className="grid grid-cols-2 gap-4">
@@ -451,17 +452,22 @@ const SignupForm = () => {
                       <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
                         First Name
                       </label>
-                      <input
-                        id="firstName"
-                        name="firstName"
-                        type="text"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                          errors.firstName ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
-                        }`}
-                        placeholder="John"
-                      />
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <FaUser className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          id="firstName"
+                          name="firstName"
+                          type="text"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 ${
+                            errors.firstName ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
+                          }`}
+                          placeholder="First name"
+                        />
+                      </div>
                       {errors.firstName && (
                         <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
                       )}
@@ -471,17 +477,22 @@ const SignupForm = () => {
                       <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
                         Last Name
                       </label>
-                      <input
-                        id="lastName"
-                        name="lastName"
-                        type="text"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                          errors.lastName ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
-                        }`}
-                        placeholder="Doe"
-                      />
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <FaUser className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          id="lastName"
+                          name="lastName"
+                          type="text"
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 ${
+                            errors.lastName ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
+                          }`}
+                          placeholder="Last name"
+                        />
+                      </div>
                       {errors.lastName && (
                         <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
                       )}
@@ -503,22 +514,26 @@ const SignupForm = () => {
                         type="text"
                         value={formData.username}
                         onChange={handleChange}
-                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 ${
                           errors.username ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
                         }`}
                         placeholder="Choose a username"
                       />
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        {isCheckingUsername && <FaSpinner className="h-4 w-4 text-gray-400 animate-spin" />}
-                        {!isCheckingUsername && usernameAvailable === true && <FaCheckCircle className="h-5 w-5 text-green-500" />}
-                        {!isCheckingUsername && usernameAvailable === false && <FaTimes className="h-5 w-5 text-red-500" />}
+                        {isCheckingUsername ? (
+                          <FaSpinner className="h-5 w-5 text-blue-500 animate-spin" />
+                        ) : usernameAvailable === true ? (
+                          <FaCheckCircle className="h-5 w-5 text-green-500" />
+                        ) : usernameAvailable === false ? (
+                          <FaTimes className="h-5 w-5 text-red-500" />
+                        ) : null}
                       </div>
                     </div>
                     {errors.username && (
                       <p className="mt-1 text-sm text-red-600">{errors.username}</p>
                     )}
                     {usernameAvailable === true && (
-                      <p className="mt-1 text-sm text-green-600">Username is available!</p>
+                      <p className="mt-1 text-sm text-green-600">✓ Username is available</p>
                     )}
                   </div>
 
@@ -537,35 +552,37 @@ const SignupForm = () => {
                         type="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 ${
                           errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
                         }`}
-                        placeholder="your.email@example.com"
+                        placeholder="Enter your email"
                       />
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        {isCheckingEmail && <FaSpinner className="h-4 w-4 text-gray-400 animate-spin" />}
-                        {!isCheckingEmail && emailAvailable === true && <FaCheckCircle className="h-5 w-5 text-green-500" />}
-                        {!isCheckingEmail && emailAvailable === false && <FaTimes className="h-5 w-5 text-red-500" />}
+                        {isCheckingEmail ? (
+                          <FaSpinner className="h-5 w-5 text-blue-500 animate-spin" />
+                        ) : emailAvailable === true ? (
+                          <FaCheckCircle className="h-5 w-5 text-green-500" />
+                        ) : emailAvailable === false ? (
+                          <FaTimes className="h-5 w-5 text-red-500" />
+                        ) : null}
                       </div>
                     </div>
                     {errors.email && (
                       <p className="mt-1 text-sm text-red-600">{errors.email}</p>
                     )}
                     {emailAvailable === true && (
-                      <p className="mt-1 text-sm text-green-600">Email is available!</p>
+                      <p className="mt-1 text-sm text-green-600">✓ Email is available</p>
                     )}
                   </div>
                 </motion.div>
-              )}
-
-              {currentStep === 2 && (
+              ) : (
                 <motion.div
                   key="step2"
                   initial={{ opacity: 0, x: 50 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -50 }}
                   transition={{ duration: 0.3 }}
-                  className="space-y-6"
+                  className="space-y-4"
                 >
                   {/* Password Field */}
                   <div>
@@ -582,10 +599,10 @@ const SignupForm = () => {
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
                         onChange={handleChange}
-                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 ${
                           errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
                         }`}
-                        placeholder="Create a strong password"
+                        placeholder="Create a password"
                       />
                       <button
                         type="button"
@@ -595,7 +612,7 @@ const SignupForm = () => {
                         {showPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
                       </button>
                     </div>
-                    
+
                     {/* Password Strength */}
                     {formData.password && (
                       <div className="mt-2">
@@ -610,22 +627,23 @@ const SignupForm = () => {
                         </div>
 
                         {/* Password Requirements */}
-                        <div className="grid grid-cols-1 gap-1 text-xs">
+                        <div className="grid grid-cols-1 gap-1">
                           {passwordRequirements.map((req) => (
-                            <div key={req.id} className={`flex items-center space-x-2 ${
-                              req.test(formData.password) ? 'text-green-600' : 'text-gray-400'
-                            }`}>
-                              {req.test(formData.password) ? 
-                                <FaCheck className="w-3 h-3" /> : 
-                                <div className="w-3 h-3 border border-gray-300 rounded-full"></div>
-                              }
-                              <span>{req.text}</span>
+                            <div key={req.id} className="flex items-center text-xs">
+                              {req.test(formData.password) ? (
+                                <FaCheck className="w-3 h-3 text-green-500 mr-2" />
+                              ) : (
+                                <FaTimes className="w-3 h-3 text-gray-400 mr-2" />
+                              )}
+                              <span className={req.test(formData.password) ? 'text-green-600' : 'text-gray-500'}>
+                                {req.text}
+                              </span>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
-                    
+
                     {errors.password && (
                       <p className="mt-1 text-sm text-red-600">{errors.password}</p>
                     )}
@@ -646,7 +664,7 @@ const SignupForm = () => {
                         type={showConfirmPassword ? "text" : "password"}
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 ${
                           errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
                         }`}
                         placeholder="Confirm your password"
@@ -679,15 +697,15 @@ const SignupForm = () => {
                         type="checkbox"
                         checked={formData.agreeToTerms}
                         onChange={handleChange}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1"
                       />
-                      <label htmlFor="agreeToTerms" className="ml-3 text-sm text-gray-700">
+                      <label htmlFor="agreeToTerms" className="ml-2 text-sm text-gray-700">
                         I agree to the{" "}
-                        <Link to="/terms" className="text-blue-600 hover:text-blue-500">
+                        <Link to="/terms" className="text-green-600 hover:text-green-500 underline">
                           Terms and Conditions
                         </Link>{" "}
                         and{" "}
-                        <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
+                        <Link to="/privacy" className="text-green-600 hover:text-green-500 underline">
                           Privacy Policy
                         </Link>
                       </label>
@@ -703,9 +721,9 @@ const SignupForm = () => {
                         type="checkbox"
                         checked={formData.agreeToMarketing}
                         onChange={handleChange}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1"
                       />
-                      <label htmlFor="agreeToMarketing" className="ml-3 text-sm text-gray-700">
+                      <label htmlFor="agreeToMarketing" className="ml-2 text-sm text-gray-700">
                         I would like to receive course updates and learning tips via email
                       </label>
                     </div>
@@ -722,21 +740,21 @@ const SignupForm = () => {
                   onClick={handlePrevStep}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200"
+                  className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
                 >
                   Previous
                 </motion.button>
               )}
-
+              
               {currentStep < 2 ? (
                 <motion.button
                   type="button"
                   onClick={handleNextStep}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex-1 py-3 px-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg font-medium hover:from-green-700 hover:to-blue-700 transition-all duration-200"
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-200 font-medium"
                 >
-                  Continue
+                  Next Step
                 </motion.button>
               ) : (
                 <motion.button
@@ -744,16 +762,16 @@ const SignupForm = () => {
                   disabled={isLoading}
                   whileHover={!isLoading ? { scale: 1.02 } : {}}
                   whileTap={!isLoading ? { scale: 0.98 } : {}}
-                  className="flex-1 py-3 px-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg font-medium hover:from-green-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg hover:from-green-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium flex items-center justify-center"
                 >
                   {isLoading ? (
                     <>
-                      <FaSpinner className="animate-spin inline mr-2" />
+                      <FaSpinner className="animate-spin -ml-1 mr-3 h-5 w-5" />
                       Creating Account...
                     </>
                   ) : (
                     <>
-                      <FaGraduationCap className="inline mr-2" />
+                      <FaGraduationCap className="w-5 h-5 mr-2" />
                       Create Account
                     </>
                   )}
@@ -762,13 +780,13 @@ const SignupForm = () => {
             </div>
           </form>
 
-          {/* Login Link */}
+          {/* Sign In Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
               <Link
                 to="/login"
-                className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
+                className="font-medium text-green-600 hover:text-green-500 transition-colors duration-200"
               >
                 Sign in here
               </Link>

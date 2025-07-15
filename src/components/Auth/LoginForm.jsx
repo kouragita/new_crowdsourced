@@ -113,7 +113,7 @@ const LoginForm = () => {
 
     try {
       const response = await axios.post(
-        "https://e-learn-ncux.onrender.com/auth/login",
+        `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
         {
           username: formData.username.trim(),
           password: formData.password,
@@ -125,15 +125,18 @@ const LoginForm = () => {
         }
       );
 
-      if (response.data && response.data.access_token) {
+      // Updated to match new backend response format
+      if (response.data && response.data.token && response.data.user) {
         const userData = {
-          username: formData.username.trim(),
-          email: response.data.email || '',
-          role: response.data.role || 'student',
-          totalPoints: response.data.total_points || 0,
-          currentStreak: response.data.current_streak || 0,
-          badges: response.data.badges || [],
-          profilePicture: response.data.profile_picture || null
+          username: response.data.user.username,
+          email: response.data.user.email || '',
+          role: response.data.user.role || 'student',
+          totalPoints: response.data.user.total_points || 0,
+          currentStreak: response.data.user.current_streak || 0,
+          badges: response.data.user.badges || [],
+          profilePicture: response.data.user.profile_picture || null,
+          id: response.data.user.id,
+          roleId: response.data.user.role_id
         };
 
         // Handle remember me
@@ -146,7 +149,10 @@ const LoginForm = () => {
         }
 
         // Login user through context
-        login(userData, response.data.access_token);
+        login(userData, response.data.token);
+
+        // Show success message
+        toast.success(`Welcome back, ${userData.username}!`);
 
         // Navigate to intended destination
         navigate(from, { replace: true });
@@ -160,6 +166,10 @@ const LoginForm = () => {
       if (error.response?.status === 401) {
         setErrors({ general: "Invalid username or password" });
         toast.error("Invalid credentials. Please try again.");
+      } else if (error.response?.status === 400) {
+        const errorMessage = error.response?.data?.message || "Invalid form data";
+        setErrors({ general: errorMessage });
+        toast.error(errorMessage);
       } else if (error.response?.status === 429) {
         setErrors({ general: "Too many login attempts. Please try again later." });
         toast.error("Too many attempts. Please wait before trying again.");
