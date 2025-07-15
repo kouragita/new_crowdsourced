@@ -28,10 +28,10 @@ const Homepage = () => {
   const navigate = useNavigate();
 
   // Intersection observer for animations
-  const [heroRef, heroInView] = useInViewObserver({ threshold: 0.1 });
-  const [featuresRef, featuresInView] = useInViewObserver({ threshold: 0.1 });
-  const [leaderboardRef, leaderboardInView] = useInViewObserver({ threshold: 0.1 });
-  const [testimonialsRef, testimonialsInView] = useInViewObserver({ threshold: 0.1 });
+  const [heroRef, heroInView] = useInView({ threshold: 0.1 });
+  const [featuresRef, featuresInView] = useInView({ threshold: 0.1 });
+  const [leaderboardRef, leaderboardInView] = useInView({ threshold: 0.1 });
+  const [testimonialsRef, testimonialsInView] = useInView({ threshold: 0.1 });
 
   useEffect(() => {
     fetchTopLearners();
