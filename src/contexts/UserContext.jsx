@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useReducer } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 // User Context
 const UserContext = createContext();
@@ -145,54 +146,38 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // Initialize user from localStorage
+  // Initialize user from token
   useEffect(() => {
-    const initializeUser = () => {
+    const initializeUser = async () => {
       dispatch({ type: USER_ACTIONS.SET_LOADING, payload: true });
-      
-      try {
-        const token = localStorage.getItem("authToken");
-        const username = localStorage.getItem("username");
-        const role = localStorage.getItem("role");
-        const storedPreferences = localStorage.getItem("userPreferences");
+      const token = localStorage.getItem("authToken");
 
-        if (token && !isTokenExpired(token) && username) {
-          const userData = {
-            username,
-            token,
-            role: role || 'student',
-            email: localStorage.getItem("userEmail") || '',
-            profilePicture: localStorage.getItem("userProfilePicture") || null,
-            totalPoints: parseInt(localStorage.getItem("userPoints")) || 0,
-            currentStreak: parseInt(localStorage.getItem("userStreak")) || 0,
-            badges: JSON.parse(localStorage.getItem("userBadges") || '[]')
-          };
-
-          // Parse and set preferences
-          if (storedPreferences) {
-            const preferences = JSON.parse(storedPreferences);
-            dispatch({ type: USER_ACTIONS.SET_THEME, payload: preferences.theme || 'light' });
-          }
-
-          dispatch({ type: USER_ACTIONS.SET_USER, payload: userData });
+      if (token && !isTokenExpired(token)) {
+        try {
+          // Set token for all subsequent axios requests
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
-          // Apply theme
-          if (storedPreferences) {
-            const preferences = JSON.parse(storedPreferences);
-            document.documentElement.classList.toggle('dark', preferences.theme === 'dark');
-          }
-        } else {
-          // Token expired or invalid
-          if (token) {
-            toast.error('Session expired. Please log in again.');
-            logout();
-          } else {
-            dispatch({ type: USER_ACTIONS.SET_LOADING, payload: false });
-          }
+          // Fetch user profile from secure endpoint
+          const response = await axios.get('http://127.0.0.1:5555/api/profile');
+          const user = response.data;
+
+          dispatch({ type: USER_ACTIONS.SET_USER, payload: { ...user, token } });
+
+          // Handle theme from preferences if needed
+          // const storedPreferences = localStorage.getItem("userPreferences");
+          // if (storedPreferences) {
+          //   const preferences = JSON.parse(storedPreferences);
+          //   dispatch({ type: USER_ACTIONS.SET_THEME, payload: preferences.theme || 'light' });
+          //   document.documentElement.classList.toggle('dark', preferences.theme === 'dark');
+          // }
+
+        } catch (error) {
+          console.error('Failed to fetch user profile:', error);
+          toast.error('Session invalid. Please log in again.');
+          logout(); // Clear invalid token
         }
-      } catch (error) {
-        console.error('Error initializing user:', error);
-        dispatch({ type: USER_ACTIONS.SET_ERROR, payload: 'Failed to initialize user session' });
+      } else {
+        dispatch({ type: USER_ACTIONS.SET_LOADING, payload: false });
       }
     };
 
@@ -202,34 +187,16 @@ export const UserProvider = ({ children }) => {
   // Login function
   const login = (userData, token) => {
     try {
-      const userWithToken = { ...userData, token };
-      
-      // Store in localStorage
+      // Store only the token in localStorage
       localStorage.setItem("authToken", token);
-      localStorage.setItem("username", userData.username);
-      localStorage.setItem("role", userData.role || 'student');
-      localStorage.setItem("userEmail", userData.email || '');
-      localStorage.setItem("userPoints", userData.totalPoints?.toString() || '0');
-      localStorage.setItem("userStreak", userData.currentStreak?.toString() || '0');
-      localStorage.setItem("userBadges", JSON.stringify(userData.badges || []));
       
-      if (userData.profilePicture) {
-        localStorage.setItem("userProfilePicture", userData.profilePicture);
-      }
+      // Set token for all subsequent axios requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      dispatch({ type: USER_ACTIONS.SET_USER, payload: userWithToken });
+      // Set user state directly from login response
+      dispatch({ type: USER_ACTIONS.SET_USER, payload: { ...userData, token } });
       
       toast.success(`Welcome back, ${userData.username}!`);
-      
-      // Add login notification
-      addNotification({
-        id: Date.now(),
-        type: 'success',
-        title: 'Login Successful',
-        message: 'You have successfully logged in to your account.',
-        timestamp: new Date().toISOString(),
-        read: false
-      });
       
     } catch (error) {
       console.error('Login error:', error);
@@ -240,13 +207,9 @@ export const UserProvider = ({ children }) => {
 
   // Logout function
   const logout = () => {
-    // Clear localStorage
-    const keysToRemove = [
-      "authToken", "username", "role", "userEmail", 
-      "userProfilePicture", "userPoints", "userStreak", "userBadges"
-    ];
-    
-    keysToRemove.forEach(key => localStorage.removeItem(key));
+    // Clear token from localStorage and axios headers
+    localStorage.removeItem("authToken");
+    delete axios.defaults.headers.common['Authorization'];
     
     dispatch({ type: USER_ACTIONS.LOGOUT });
     

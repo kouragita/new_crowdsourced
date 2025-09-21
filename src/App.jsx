@@ -173,16 +173,15 @@ const App = () => {
                 />
                 <Route path="user-dashboard/:id" element={<UserDashboard />} />
                 
-                {/* Admin only route */}
-                <Route 
-                  path="admin" 
-                  element={
-                    <ProtectedRoute requireAuth={true} requireAdmin={true}>
-                      <AdminPanel />
-                    </ProtectedRoute>
-                  } 
-                />
-              </Route>
+              {/* Protected Admin Route */}
+              <Route 
+                path="/admin/*" 
+                element={
+                  <ProtectedRoute requireAuth={true} requireAdmin={true}>
+                    <AdminPanel />
+                  </ProtectedRoute>
+                } 
+              />
 
               {/* Public leaderboard route with protection */}
               <Route 

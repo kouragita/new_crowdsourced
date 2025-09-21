@@ -2,12 +2,18 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useUser } from '../../contexts/UserContext';
 
 const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) => {
   const location = useLocation();
-  const token = localStorage.getItem('authToken');
-  const userRole = localStorage.getItem('role');
-  const isAuthenticated = !!token;
+  const { isAuthenticated, user, loading } = useUser();
+
+  if (loading) {
+    // You might want to show a loading spinner here
+    return <div>Loading...</div>;
+  }
+
+  const userRole = user?.role;
   const isAdmin = userRole === 'admin';
 
   // If authentication is required but user is not authenticated
@@ -17,7 +23,7 @@ const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) 
   }
 
   // If admin role is required but user is not admin
-  if (requireAdmin && (!isAuthenticated || !isAdmin)) {
+  if (requireAdmin && !isAdmin) {
     toast.error('Access denied. Admin privileges required.');
     return <Navigate to="/dashboard" replace />;
   }
