@@ -27,6 +27,7 @@ const SignupForm = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "learner", // Add role to state, default to learner
     firstName: "",
     lastName: "",
     agreeToTerms: false,
@@ -223,21 +224,14 @@ const SignupForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/signup`,
-        {
-          username: formData.username.trim(),
-          email: formData.email.trim(),
-          password: formData.password,
-          first_name: formData.firstName.trim(),
-          last_name: formData.lastName.trim(),
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await apiClient.post("/auth/signup", {
+        username: formData.username.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName.trim(),
+        role: formData.role, // Send the selected role
+      });
 
       // Updated to match new backend response format
       if (response.data && response.data.token && response.data.user) {
@@ -573,6 +567,23 @@ const SignupForm = () => {
                     {emailAvailable === true && (
                       <p className="mt-1 text-sm text-green-600">✓ Email is available</p>
                     )}
+                  </div>
+
+                  {/* Role Selection */}
+                  <div>
+                    <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+                      I am a...
+                    </label>
+                    <select
+                      id="role"
+                      name="role"
+                      value={formData.role}
+                      onChange={handleChange}
+                      className="w-full pl-3 pr-10 py-3 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                    >
+                      <option value="learner">Learner</option>
+                      <option value="contributor">Contributor</option>
+                    </select>
                   </div>
                 </motion.div>
               ) : (

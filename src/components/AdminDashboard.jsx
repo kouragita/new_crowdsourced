@@ -31,10 +31,10 @@ import toast from "react-hot-toast";
 
 import { Routes, Route } from 'react-router-dom';
 import AdminSidebar from "./Admin/AdminSidebar";
-import { AdminOverview, UserManagement, ContentManagement, AdminAnalytics, AdminSettings } from './Admin/views';
-import LearningPathDetailView from './Admin/views/LearningPathDetailView';
-import IntegrationsManagement from './Admin/views/IntegrationsManagement';
-import QuizManagementView from './Admin/views/QuizManagementView';
+// import { AdminOverview, UserManagement, ContentManagement, AdminAnalytics, AdminSettings } from './Admin/views';
+// import LearningPathDetailView from './Admin/views/LearningPathDetailView';
+// import IntegrationsManagement from './Admin/views/IntegrationsManagement';
+// import QuizManagementView from './Admin/views/QuizManagementView';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -256,7 +256,7 @@ const AdminDashboard = () => {
     <div className="flex h-screen bg-gray-100">
       <AdminSidebar />
       <main className="flex-1 overflow-y-auto p-6 space-y-8">
-        <Routes>
+        {/* <Routes>
           <Route path="/" element={<AdminOverview />} />
           <Route path="/users" element={<UserManagement />} />
           <Route path="/content" element={<ContentManagement />} />
@@ -265,8 +265,10 @@ const AdminDashboard = () => {
           <Route path="/analytics" element={<AdminAnalytics />} />
           <Route path="/settings" element={<AdminSettings />} />
           <Route path="/integrations" element={<IntegrationsManagement />} />
-        </Routes>
+        </Routes> */}
       </main>
     </div>
   );
 }
+
+export default AdminDashboard;

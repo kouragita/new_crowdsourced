@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useReducer } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import apiClient from '../services/api';
 
 // User Context
 const UserContext = createContext();
@@ -154,11 +154,9 @@ export const UserProvider = ({ children }) => {
 
       if (token && !isTokenExpired(token)) {
         try {
-          // Set token for all subsequent axios requests
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          
+
           // Fetch user profile from secure endpoint
-          const response = await axios.get('http://127.0.0.1:5555/api/profile');
+          const response = await apiClient.get('/profile');
           const user = response.data;
 
           dispatch({ type: USER_ACTIONS.SET_USER, payload: { ...user, token } });

@@ -172,6 +172,7 @@ const App = () => {
                   } 
                 />
                 <Route path="user-dashboard/:id" element={<UserDashboard />} />
+                </Route>
                 
               {/* Protected Admin Route */}
               <Route 

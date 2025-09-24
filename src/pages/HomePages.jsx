@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, useInView } from "framer-motion";           
 import { useInView as useInViewObserver } from "react-intersection-observer";
-import axios from "axios";
+import apiClient from "../services/api";
 import toast from "react-hot-toast";
 import {
   FaUsers,
@@ -39,7 +39,7 @@ const Homepage = () => {
 
   const fetchTopLearners = async () => {
     try {
-      const response = await axios.get("https://e-learn-ncux.onrender.com/api/leaderboard");
+      const response = await apiClient.get("/leaderboard");
       if (Array.isArray(response.data.leaderboard)) {
         setTopLearners(response.data.leaderboard);
       } else {

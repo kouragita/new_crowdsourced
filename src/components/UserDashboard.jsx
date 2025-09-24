@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import RecommendedCourses from './AI/RecommendedCourses';
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import axios from "axios";
@@ -19,22 +18,155 @@ import {
   FaUsers,
   FaGraduationCap,
   FaAward,
-  FaBullseye, // FIXED: Changed from FaTarget to FaBullseye
+  FaBullseye,
   FaClock,
   FaArrowRight,
-  FaSpinner
+  FaSpinner,
+  FaTimes
 } from "react-icons/fa";
 import { useUser } from "../contexts/UserContext";
 
-const UserDashboard = () => {
-  return (
-    <div className="p-4 space-y-6">
-      <h1 className="text-2xl font-bold">Your Dashboard</h1>
-      <RecommendedCourses />
-      {/* Other dashboard components will go here */}
-    </div>
-  );
+// MOCK DATA - In a real app, this would come from an API
+const mockDashboardData = {
+  stats: {
+    points: 1250,
+    coursesCompleted: 5,
+    currentStreak: 14,
+    studyTimeToday: 45,
+    weeklyProgress: 210,
+    weeklyGoal: 300,
+  },
+  leaderboardPosition: 42,
+  currentCourses: [
+    {
+      id: 1,
+      title: "Advanced React Patterns",
+      nextLesson: "Understanding Render Props",
+      progress: 75,
+      instructor: "Jane Doe",
+      duration: "8h remaining",
+      difficulty: "Advanced",
+    },
+    {
+      id: 2,
+      title: "Data Structures in Python",
+      nextLesson: "Implementing Hash Tables",
+      progress: 40,
+      instructor: "John Smith",
+      duration: "12h remaining",
+      difficulty: "Intermediate",
+    },
+  ],
+  todaysTasks: [
+    { id: 1, task: "Watch video on React Hooks", completed: true, priority: "high" },
+    { id: 2, task: "Complete Chapter 3 quiz", completed: false, priority: "high" },
+    { id: 3, task: "Read article on Python decorators", completed: false, priority: "medium" },
+  ],
+  achievements: [
+    { id: 1, title: "Course Starter", icon: FaPlayCircle, earned: true, color: "text-green-500" },
+    { id: 2, title: "Quiz Master", icon: FaCheck, earned: true, color: "text-blue-500" },
+    { id: 3, title: "Streak Keeper", icon: FaFire, earned: true, color: "text-orange-500" },
+    { id: 4, title: "Pathfinder", icon: FaBook, earned: false, color: "text-gray-400" },
+    { id: 5, title: "Top Learner", icon: FaTrophy, earned: false, color: "text-gray-400" },
+  ],
+  recentActivity: [
+    { id: 1, type: "course_completed", title: "Completed 'Intro to SQL'", time: "2 hours ago", points: 100 },
+    { id: 2, type: "badge_earned", title: "Earned 'Quiz Master' Badge", time: "1 day ago", points: 50 },
+    { id: 3, type: "streak_milestone", title: "Reached a 14-day streak!", time: "yesterday", points: 75 },
+  ],
 };
+
+const UserDashboard = () => {
+  const { user } = useUser();
+  const [dashboardData, setDashboardData] = useState(mockDashboardData);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedLearningPath, setSelectedLearningPath] = useState(null);
+
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      // In a real app, you would fetch data from your API here
+      // For now, we use mock data after a short delay
+      setTimeout(() => {
+        setDashboardData(mockDashboardData);
+        setLoading(false);
+      }, 1000);
+    };
+    fetchData();
+  }, [user]);
+
+  const toggleTask = (taskId) => {
+    setDashboardData(prev => ({
+      ...prev,
+      todaysTasks: prev.todaysTasks.map(task =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
+    }));
+  };
+
+  const getProgressColor = (progress) => {
+    if (progress > 70) return "from-green-500 to-teal-500";
+    if (progress > 40) return "from-yellow-500 to-orange-500";
+    return "from-red-500 to-pink-500";
+  };
+
+  const getPriorityColor = (priority) => {
+    if (priority === 'high') return "border-red-400";
+    if (priority === 'medium') return "border-yellow-400";
+    return "border-green-400";
+  };
+
+  const openLearningPathModal = (path) => {
+    setSelectedLearningPath(path);
+    setIsModalOpen(true);
+  };
+
+  const closeLearningPathModal = () => {
+    setIsModalOpen(false);
+    setSelectedLearningPath(null);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <FaSpinner className="w-12 h-12 text-blue-600 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref} className="p-4 sm:p-6 lg:p-8 space-y-8 bg-gray-50 min-h-screen">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-3xl font-bold text-gray-800">Welcome back, {user?.username || 'Learner'}!</h1>
+        <p className="text-gray-600 mt-1">Let's continue your learning journey.</p>
+      </motion.div>
+
+      {/* Stats Grid */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={inView ? { opacity: 1 } : {}}
+        transition={{ staggerChildren: 0.1, delayChildren: 0.2 }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6"
+      >
+        {[
+          {
+            title: "Total Points",
+            value: dashboardData.stats.points,
+            icon: FaStar,
+            color: "from-purple-500 to-purple-600",
+            bgColor: "bg-purple-50",
+            change: "+50 this week"
+          },
           {
             title: "Courses Completed",
             value: dashboardData.stats.coursesCompleted,
