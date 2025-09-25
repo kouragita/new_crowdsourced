@@ -10,8 +10,8 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 
 // Pages
 import Home from './pages/HomePages.jsx';
-import LoginForm from './components/Auth/LoginForm';
-import SignupForm from './components/Auth/SignupForm';
+import LoginForm from './components/Auth/LoginForm.jsx';
+import SignupForm from './components/Auth/SignupForm.jsx';
 import Dashboard from './components/Dashboard';
 import UserProfile from './components/UserProfile.jsx';
 import UserDashboard from './components/UserDashboard.jsx';
@@ -176,7 +176,7 @@ const App = () => {
                 
               {/* Protected Admin Route */}
               <Route 
-                path="/admin/*" 
+                path="/admin" 
                 element={
                   <ProtectedRoute requireAuth={true} requireAdmin={true}>
                     <AdminPanel />

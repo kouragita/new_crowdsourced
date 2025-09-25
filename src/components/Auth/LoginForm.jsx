@@ -15,6 +15,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import toast from "react-hot-toast";
+import apiClient from "../../services/api";
 import { useUser } from "../../contexts/UserContext";
 
 const LoginForm = () => {
@@ -33,7 +34,7 @@ const LoginForm = () => {
   const { login } = useUser();
 
   // Get the intended destination from location state
-  const from = location.state?.from || "/dashboard";
+  const from = location.state?.from?.pathname || "/dashboard";
 
   // Check for saved credentials
   useEffect(() => {
@@ -113,7 +114,7 @@ const LoginForm = () => {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
+        `${import.meta.env.VITE_API_URL.replace('/api', '')}/auth/login`,
         {
           username: formData.username.trim(),
           password: formData.password,

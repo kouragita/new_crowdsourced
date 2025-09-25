@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useReducer } fro
 import { jwtDecode } from 'jwt-decode';
 import toast from 'react-hot-toast';
 import apiClient from '../services/api';
+import axios from 'axios';
 
 // User Context
 const UserContext = createContext();
@@ -24,6 +25,7 @@ const USER_ACTIONS = {
 const initialState = {
   user: null,
   isAuthenticated: false,
+  isAdmin: false,
   loading: true,
   error: null,
   theme: 'light',
@@ -44,6 +46,7 @@ const userReducer = (state, action) => {
         ...state,
         user: action.payload,
         isAuthenticated: !!action.payload,
+        isAdmin: action.payload?.role?.name === 'admin',
         loading: false,
         error: null
       };
@@ -188,8 +191,8 @@ export const UserProvider = ({ children }) => {
       // Store only the token in localStorage
       localStorage.setItem("authToken", token);
       
-      // Set token for all subsequent axios requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // Set token for all subsequent apiClient requests
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       // Set user state directly from login response
       dispatch({ type: USER_ACTIONS.SET_USER, payload: { ...userData, token } });
@@ -204,10 +207,20 @@ export const UserProvider = ({ children }) => {
   };
 
   // Logout function
-  const logout = () => {
-    // Clear token from localStorage and axios headers
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        await apiClient.post('/auth/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
+      }
+    } catch (error) {
+      console.error('Error logging out on server:', error);
+      // Still proceed with client-side logout even if server call fails
+    }
+
+    // Clear token from localStorage and apiClient headers
     localStorage.removeItem("authToken");
-    delete axios.defaults.headers.common['Authorization'];
+    delete apiClient.defaults.headers.common['Authorization'];
     
     dispatch({ type: USER_ACTIONS.LOGOUT });
     
@@ -302,6 +315,32 @@ export const UserProvider = ({ children }) => {
       totalLearningTime: state.user?.totalLearningTime || 0
     };
   };
+  
+  // Function to completely clear all authentication data from localStorage
+  const clearAuthData = () => {
+    // Clear all authentication-related storage
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("username");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userProfilePicture");
+    localStorage.removeItem("userPoints");
+    localStorage.removeItem("userStreak");
+    localStorage.removeItem("userBadges");
+    localStorage.removeItem("userPreferences");
+    localStorage.removeItem("rememberedUsername");
+    localStorage.removeItem("rememberedPassword");
+    
+    // Clear axios authentication
+    delete axios.defaults.headers.common['Authorization'];
+    
+    // Reset state
+    dispatch({ type: USER_ACTIONS.LOGOUT });
+    
+    // Remove theme class
+    document.documentElement.classList.remove('dark');
+    
+    toast.success('Authentication data cleared successfully');
+  };
 
   const contextValue = {
     // State
@@ -310,8 +349,7 @@ export const UserProvider = ({ children }) => {
     // Authentication methods
     login,
     logout,
-    isAuthenticated,
-    isAdmin,
+    clearAuthData,  // Add this function to clear all auth data
     
     // Profile methods
     updateProfile,

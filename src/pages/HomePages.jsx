@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion, useInView } from "framer-motion";           
+import { motion, useInView, AnimatePresence } from "framer-motion";           
 import { useInView as useInViewObserver } from "react-intersection-observer";
 import apiClient from "../services/api";
 import toast from "react-hot-toast";
@@ -26,6 +26,21 @@ const Homepage = () => {
   const [loading, setLoading] = useState(true);
   const [showHiddenLearners, setShowHiddenLearners] = useState(false);
   const navigate = useNavigate();
+  const [carouselIndex, setCarouselIndex] = useState(0);
+
+  const carouselImages = [
+    '/images/hero image.jpeg',
+    '/images/hero image 2.jpg',
+    '/images/hero image 3.jpg',
+    '/images/hero image 4.jpg',
+  ];
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCarouselIndex((prevIndex) => (prevIndex + 1) % carouselImages.length);
+    }, 5000); // Change slide every 5 seconds
+    return () => clearTimeout(timer);
+  }, [carouselIndex]);
 
   // Intersection observer for animations
   const [heroRef, heroInView] = useInViewObserver({ threshold: 0.1 });
@@ -157,14 +172,20 @@ const Homepage = () => {
   return (
     <div className="bg-gray-50 text-gray-800 overflow-hidden">
       {/* Hero Section */}
-      <section ref={heroRef} className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 py-20 lg:py-32 overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full animate-pulse"></div>
-          <div className="absolute top-32 right-20 w-24 h-24 bg-white rounded-full animate-pulse delay-1000"></div>
-          <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-white rounded-full animate-pulse delay-500"></div>
-          <div className="absolute bottom-32 right-1/3 w-20 h-20 bg-white rounded-full animate-pulse delay-1500"></div>
-        </div>
+      <section ref={heroRef} className="relative py-20 lg:py-32 overflow-hidden">
+        <AnimatePresence initial={false}>
+          <motion.img
+            key={carouselIndex}
+            src={carouselImages[carouselIndex]}
+            alt={`Slide ${carouselIndex + 1}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5 }}
+            className='absolute inset-0 w-full h-full object-cover'
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.div
@@ -490,8 +511,22 @@ const Homepage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 lg:py-32 bg-gradient-to-r from-blue-600 to-purple-700">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative py-20 lg:py-32 overflow-hidden">
+        {/* Animated Background Image */}
+        <motion.div
+          className="absolute inset-0 w-full h-full"
+          initial={{ scale: 1.1 }}
+          whileInView={{ scale: 1 }}
+          transition={{ duration: 8, ease: "easeInOut" }}
+          viewport={{ once: true }}
+        >
+          <img src="/images/image.jpeg" alt="Learning Environment" className="w-full h-full object-cover" />
+        </motion.div>
+
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-800/70 to-purple-800/70"></div>
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}

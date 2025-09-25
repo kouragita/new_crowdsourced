@@ -143,7 +143,7 @@ const Dashboard = () => {
             </div>
 
             <nav className="flex-1 px-6 space-y-1 overflow-y-auto">
-              {[...menuItems, ...(isAdmin() ? [adminMenuItem] : [])].map((item, index) => (
+              {[...menuItems, ...(isAdmin ? [adminMenuItem] : [])].map((item, index) => (
                 <motion.div key={item.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }}>
                   <Link
                     to={item.path}

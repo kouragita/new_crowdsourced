@@ -19,15 +19,12 @@ const PageLoader = () => (
 
 const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) => {
   const location = useLocation();
-  const { isAuthenticated, user, loading } = useUser();
+  const { isAuthenticated, isAdmin, loading } = useUser();
 
   // 1. Wait for the user session to be loaded before making any decisions
   if (loading) {
     return <PageLoader />;
   }
-
-  const userRole = user?.role;
-  const isAdmin = userRole === 'admin';
 
   // 2. Handle routes that require authentication
   if (requireAuth) {
@@ -46,10 +43,12 @@ const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) 
 
   // 3. Handle public routes like /login and /signup
   if (!requireAuth && isAuthenticated) {
-    // If user is already logged in, redirect them away from login/signup
-    // to their appropriate dashboard.
-    const targetDashboard = isAdmin ? '/admin' : '/dashboard';
-    return <Navigate to={targetDashboard} replace />;
+    // Only redirect if user is trying to access login/signup directly while already logged in
+    if (location.pathname === '/login' || location.pathname === '/signup') {
+      // Determine appropriate dashboard based on user role
+      const targetDashboard = isAdmin ? '/admin' : '/dashboard';
+      return <Navigate to={targetDashboard} replace />;
+    }
   }
 
   // 4. If all checks pass, render the requested component

@@ -19,6 +19,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import toast from "react-hot-toast";
+import apiClient from "../../services/api";
 import { useUser } from "../../contexts/UserContext";
 
 const SignupForm = () => {
@@ -224,14 +225,19 @@ const SignupForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await apiClient.post("/auth/signup", {
-        username: formData.username.trim(),
-        email: formData.email.trim(),
-        password: formData.password,
-        first_name: formData.firstName.trim(),
-        last_name: formData.lastName.trim(),
-        role: formData.role, // Send the selected role
-      });
+      const response = await apiClient.post(
+        '/register',
+        {
+          username: formData.username.trim(),
+          email: formData.email.trim(),
+          password: formData.password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       // Updated to match new backend response format
       if (response.data && response.data.token && response.data.user) {
