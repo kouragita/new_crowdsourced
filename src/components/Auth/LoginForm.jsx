@@ -18,7 +18,7 @@ import toast from "react-hot-toast";
 import apiClient from "../../services/api";
 import { useUser } from "../../contexts/UserContext";
 
-const LoginForm = () => {
+export const LoginForm = () => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -113,16 +113,11 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL.replace('/api', '')}/auth/login`,
+      const response = await apiClient.post(
+        '/auth/login',
         {
           username: formData.username.trim(),
           password: formData.password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
         }
       );
 
@@ -466,5 +461,3 @@ const LoginForm = () => {
     </div>
   );
 };
-
-export default LoginForm;

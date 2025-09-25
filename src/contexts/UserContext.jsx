@@ -25,7 +25,6 @@ const USER_ACTIONS = {
 const initialState = {
   user: null,
   isAuthenticated: false,
-  isAdmin: false,
   loading: true,
   error: null,
   theme: 'light',
@@ -46,7 +45,6 @@ const userReducer = (state, action) => {
         ...state,
         user: action.payload,
         isAuthenticated: !!action.payload,
-        isAdmin: action.payload?.role?.name === 'admin',
         loading: false,
         error: null
       };
@@ -209,25 +207,16 @@ export const UserProvider = ({ children }) => {
   // Logout function
   const logout = async () => {
     try {
-      const token = localStorage.getItem("authToken");
-      if (token) {
-        await apiClient.post('/auth/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
-      }
+      await apiClient.post('/auth/logout');
+      toast.success('Logged out successfully');
     } catch (error) {
-      console.error('Error logging out on server:', error);
-      // Still proceed with client-side logout even if server call fails
+      console.error('Server logout failed, proceeding with client-side logout.', error);
+    } finally {
+      // Always clear client-side data regardless of server response
+      localStorage.removeItem("authToken");
+      dispatch({ type: USER_ACTIONS.LOGOUT });
+      document.documentElement.classList.remove('dark');
     }
-
-    // Clear token from localStorage and apiClient headers
-    localStorage.removeItem("authToken");
-    delete apiClient.defaults.headers.common['Authorization'];
-    
-    dispatch({ type: USER_ACTIONS.LOGOUT });
-    
-    // Remove theme class
-    document.documentElement.classList.remove('dark');
-    
-    toast.success('Logged out successfully');
   };
 
   // Update profile function

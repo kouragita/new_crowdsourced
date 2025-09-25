@@ -10,15 +10,18 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 
 // Pages
 import Home from './pages/HomePages.jsx';
-import LoginForm from './components/Auth/LoginForm.jsx';
-import SignupForm from './components/Auth/SignupForm.jsx';
+import { LoginForm } from './components/Auth/LoginForm.jsx';
+import { SignupForm } from './components/Auth/SignupForm.jsx';
 import Dashboard from './components/Dashboard';
 import UserProfile from './components/UserProfile.jsx';
-import UserDashboard from './components/UserDashboard.jsx';
+import { UserDashboard } from './components/UserDashboard.jsx';
 import Calendar from './components/Calendar.jsx';
 import CoursesPage from './pages/CoursesPages.jsx';
 import Leaderboard from './components/LeaderBoard.jsx';
-import AdminPanel from './components/AdminDashboard.jsx';
+import UserManagement from './components/admin/UserManagement';
+import ContentManagement from './components/admin/ContentManagement';
+import AdminAIConsole from './components/admin/AdminAIConsole';
+import AdminDashboardView from './components/AdminDashboardView.jsx';
 
 // Styles
 import './index.css';
@@ -174,15 +177,20 @@ const App = () => {
                 <Route path="user-dashboard/:id" element={<UserDashboard />} />
                 </Route>
                 
-              {/* Protected Admin Route */}
+              {/* Admin Routes: Nested within the main dashboard layout */}
               <Route 
-                path="/admin" 
+                path="/admin"
                 element={
                   <ProtectedRoute requireAuth={true} requireAdmin={true}>
-                    <AdminPanel />
+                    <Dashboard />
                   </ProtectedRoute>
-                } 
-              />
+                }
+              >
+                <Route index element={<AdminDashboardView />} />
+                <Route path="users" element={<UserManagement />} />
+                <Route path="content" element={<ContentManagement />} />
+                <Route path="ai-console" element={<AdminAIConsole />} />
+              </Route>
 
               {/* Public leaderboard route with protection */}
               <Route 

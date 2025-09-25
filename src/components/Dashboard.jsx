@@ -18,20 +18,16 @@ import {
   FaUserShield,
   FaMoon,
   FaSun,
-  FaHome
+  FaHome,
+  FaUsers,
+  FaRocket
 } from "react-icons/fa";
 
+import { useRole } from "../hooks/useRole";
+
 const Dashboard = () => {
-  const {
-    user,
-    loading,
-    error,
-    isAdmin,
-    logout,
-    theme,
-    setTheme,
-    notifications
-  } = useUser(); // Consume the context
+  const { user, loading, error, logout, theme, setTheme, notifications } = useUser();
+  const { isAdmin } = useRole();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,13 +44,12 @@ const Dashboard = () => {
     { id: 'leaderboard', label: 'Leaderboard', icon: FaTrophy, path: '/dashboard/leaderboard', description: 'See top performers' },
   ];
 
-  const adminMenuItem = {
-    id: 'admin',
-    label: 'Admin Panel',
-    icon: FaUserShield,
-    path: '/admin',
-    description: 'Administrative controls'
-  };
+  const adminMenuItems = [
+    { id: 'admin-overview', label: 'Admin Overview', icon: FaUserShield, path: '/admin', description: 'Overall platform summary' },
+    { id: 'admin-users', label: 'User Management', icon: FaUsers, path: '/admin/users', description: 'Manage all users' },
+    { id: 'admin-content', label: 'Content Management', icon: FaBook, path: '/admin/content', description: 'Manage all content' },
+    { id: 'admin-ai', label: 'AI Console', icon: FaRocket, path: '/admin/ai-console', description: 'Admin AI tools' },
+  ];
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -143,7 +138,7 @@ const Dashboard = () => {
             </div>
 
             <nav className="flex-1 px-6 space-y-1 overflow-y-auto">
-              {[...menuItems, ...(isAdmin ? [adminMenuItem] : [])].map((item, index) => (
+              {menuItems.map((item, index) => (
                 <motion.div key={item.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }}>
                   <Link
                     to={item.path}
@@ -173,6 +168,42 @@ const Dashboard = () => {
                   </Link>
                 </motion.div>
               ))}
+
+              {isAdmin && (
+                <>
+                  <div className="pt-4 pb-2 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Admin</div>
+                  {adminMenuItems.map((item, index) => (
+                    <motion.div key={item.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: (menuItems.length + index) * 0.1 }}>
+                      <Link
+                        to={item.path}
+                        className={`flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 group relative overflow-hidden ${
+                          isActiveRoute(item.path)
+                            ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 shadow-sm'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                        }`}>
+                        {isActiveRoute(item.path) && (
+                          <motion.div layoutId="activeTab" className="absolute left-0 top-0 bottom-0 w-1 bg-purple-600 dark:bg-purple-400 rounded-r-full" initial={false} transition={{ type: "spring", stiffness: 500, damping: 30 }} />
+                        )}
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${
+                          isActiveRoute(item.path) 
+                            ? 'bg-purple-100 dark:bg-purple-800/50' 
+                            : 'bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600'
+                        }`}>
+                          <item.icon className={`w-5 h-5 transition-colors ${
+                              isActiveRoute(item.path) 
+                                ? 'text-purple-600 dark:text-purple-400' 
+                                : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'
+                            }`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{item.label}</p>
+                          <p className="text-xs opacity-75 truncate">{item.description}</p>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </>
+              )}
             </nav>
 
             <div className="p-6 space-y-2 border-t border-gray-200 dark:border-gray-700">

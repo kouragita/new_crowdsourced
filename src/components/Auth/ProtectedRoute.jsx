@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useUser } from '../../contexts/UserContext';
+import { useRole } from '../../hooks/useRole';
 
-// Re-using the PageLoader from App.jsx for a consistent loading experience
 const PageLoader = () => (
   <div className="fixed inset-0 bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center z-50">
     <div className="text-center">
@@ -19,39 +19,38 @@ const PageLoader = () => (
 
 const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) => {
   const location = useLocation();
-  const { isAuthenticated, isAdmin, loading } = useUser();
+  const { isAuthenticated, loading } = useUser();
+  const { isAdmin } = useRole(); // Correctly use the dedicated role hook
 
-  // 1. Wait for the user session to be loaded before making any decisions
+  const [toastShown, setToastShown] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated && requireAuth && !toastShown) {
+      toast.error('Please log in to access this page');
+      setToastShown(true);
+    }
+  }, [loading, isAuthenticated, requireAuth, toastShown]);
+
   if (loading) {
     return <PageLoader />;
   }
 
-  // 2. Handle routes that require authentication
   if (requireAuth) {
     if (!isAuthenticated) {
-      toast.error('Please log in to access this page');
       return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // Handle admin-only routes
     if (requireAdmin && !isAdmin) {
       toast.error('Access denied. Admin privileges required.');
-      // Redirect non-admins away from admin pages to their own dashboard
       return <Navigate to="/dashboard" replace />;
     }
   }
 
-  // 3. Handle public routes like /login and /signup
   if (!requireAuth && isAuthenticated) {
-    // Only redirect if user is trying to access login/signup directly while already logged in
-    if (location.pathname === '/login' || location.pathname === '/signup') {
-      // Determine appropriate dashboard based on user role
-      const targetDashboard = isAdmin ? '/admin' : '/dashboard';
-      return <Navigate to={targetDashboard} replace />;
-    }
+    const targetDashboard = isAdmin ? '/admin' : '/dashboard';
+    return <Navigate to={targetDashboard} replace />;
   }
 
-  // 4. If all checks pass, render the requested component
   return (
     <motion.div
       initial={{ opacity: 0 }}

@@ -22,7 +22,7 @@ import toast from "react-hot-toast";
 import apiClient from "../../services/api";
 import { useUser } from "../../contexts/UserContext";
 
-const SignupForm = () => {
+export const SignupForm = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -814,5 +814,3 @@ const SignupForm = () => {
     </div>
   );
 };
-
-export default SignupForm;
